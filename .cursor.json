@@ -1,0 +1,15 @@
+{
+  "typescript": {
+    "tsdk": "node_modules/typescript/lib"
+  },
+  "editor": {
+    "formatOnSave": true,
+    "defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files": {
+    "associations": {
+      "*.tsx": "typescriptreact",
+      "*.ts": "typescript"
+    }
+  }
+} 
