@@ -5,7 +5,10 @@
     "delete": "Delete",
     "edit": "Edit",
     "loading": "Loading...",
-    "error": "Error"
+    "error": "Error",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish"
   },
   "editor": {
     "title": "LaTeX Editor",
@@ -19,5 +22,23 @@
     "language": "Language",
     "theme": "Theme",
     "appearance": "Appearance"
+  },
+  "welcome": {
+    "step1": {
+      "title": "Welcome to LaTeX Agent",
+      "description": "LaTeX Agent is a powerful tool to help you write LaTeX documents with ease. Let's get started!"
+    },
+    "step2": {
+      "title": "Features Overview",
+      "description": "Our tool provides real-time preview, auto-completion, and intelligent suggestions to make your LaTeX writing experience smooth and efficient."
+    },
+    "step3": {
+      "title": "Ready to Start",
+      "description": "You're all set! Click 'Finish' to begin your LaTeX writing journey."
+    }
+  },
+  "main": {
+    "title": "LaTeX Agent",
+    "description": "Welcome to your LaTeX writing workspace. Start by creating a new document or opening an existing one."
   }
 } 

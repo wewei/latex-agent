@@ -5,7 +5,10 @@
     "delete": "删除",
     "edit": "编辑",
     "loading": "加载中...",
-    "error": "错误"
+    "error": "错误",
+    "previous": "上一步",
+    "next": "下一步",
+    "finish": "完成"
   },
   "editor": {
     "title": "LaTeX 编辑器",
@@ -19,5 +22,23 @@
     "language": "语言",
     "theme": "主题",
     "appearance": "外观"
+  },
+  "welcome": {
+    "step1": {
+      "title": "欢迎使用 LaTeX Agent",
+      "description": "LaTeX Agent 是一个强大的工具，可以帮助您轻松编写 LaTeX 文档。让我们开始吧！"
+    },
+    "step2": {
+      "title": "功能概览",
+      "description": "我们的工具提供实时预览、自动补全和智能建议，让您的 LaTeX 写作体验更加流畅高效。"
+    },
+    "step3": {
+      "title": "准备就绪",
+      "description": "一切准备就绪！点击\"完成\"开始您的 LaTeX 写作之旅。"
+    }
+  },
+  "main": {
+    "title": "LaTeX Agent",
+    "description": "欢迎来到您的 LaTeX 写作工作区。通过创建新文档或打开现有文档开始使用。"
   }
 } 
