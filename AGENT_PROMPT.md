@@ -171,3 +171,40 @@ src/
     | { type: 'LOAD_DOCUMENT'; payload: { id: string } }
     | { type: 'DOCUMENT_SAVED'; payload: { success: boolean } };
   ```
+```
+
+## 开发规范
+
+### 国际化规范
+所有界面文本必须使用 i18n：
+
+1. 文本定义：
+   - 所有界面文本必须在语言文件中定义
+   - 使用嵌套结构组织文本（如 common、editor、settings 等）
+   - 避免硬编码文本
+
+2. 组件使用：
+```typescript
+// 正确示例
+const Button: React.FC = () => {
+  const { t } = useTranslation();
+  return <button>{t('common.save')}</button>;
+};
+
+// 错误示例
+const Button: React.FC = () => {
+  return <button>Save</button>; // 不要直接使用硬编码文本
+};
+```
+
+3. 类型安全：
+   - 使用 Resources 类型确保翻译键存在
+   - 使用 Language 类型确保语言代码正确
+
+4. 动态文本：
+```typescript
+const Greeting: React.FC<{ name: string }> = ({ name }) => {
+  const { t } = useTranslation();
+  return <div>{t('greeting', { name })}</div>;
+};
+```

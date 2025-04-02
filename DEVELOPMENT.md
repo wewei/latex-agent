@@ -165,3 +165,46 @@ pnpm install
 ## 许可证
 
 MIT License 
+
+## 国际化支持
+
+### 配置说明
+项目使用 i18next 和 react-i18next 实现国际化：
+
+1. 配置文件：
+   - `src/shared/i18n/config.ts` - i18n 配置
+   - `src/shared/i18n/locales/` - 语言文件目录
+   - `en.json` - 英文翻译
+   - `zh.json` - 中文翻译
+
+2. 使用方法：
+```typescript
+import { useTranslation } from 'react-i18next';
+
+const Component: React.FC = () => {
+  const { t } = useTranslation();
+  return <div>{t('common.save')}</div>;
+};
+```
+
+3. 语言切换：
+```typescript
+import { useTranslation } from 'react-i18next';
+
+const LanguageSwitcher: React.FC = () => {
+  const { i18n } = useTranslation();
+  return (
+    <select onChange={(e) => i18n.changeLanguage(e.target.value)}>
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+    </select>
+  );
+};
+```
+
+### 开发规范
+- 所有界面文本必须使用 i18n
+- 避免硬编码文本
+- 使用嵌套结构组织翻译键
+- 保持翻译文件的结构一致
+- 使用类型确保翻译键存在 

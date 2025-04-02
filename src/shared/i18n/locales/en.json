@@ -1,0 +1,23 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error"
+  },
+  "editor": {
+    "title": "LaTeX Editor",
+    "newDocument": "New Document",
+    "openDocument": "Open Document",
+    "saveDocument": "Save Document",
+    "exportPDF": "Export PDF"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "appearance": "Appearance"
+  }
+} 
