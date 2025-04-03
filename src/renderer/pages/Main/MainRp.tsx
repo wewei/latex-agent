@@ -1,8 +1,12 @@
 import React from 'react';
-import { Container, Paper, Typography } from '@mui/material';
+import { Container, Paper, Typography, Button, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-const MainRp: React.FC = () => {
+type MainRpProps = {
+  onNavigateToEdit: (documentId: string) => void;
+};
+
+const MainRp: React.FC<MainRpProps> = ({ onNavigateToEdit }) => {
   const { t } = useTranslation();
 
   return (
@@ -11,9 +15,18 @@ const MainRp: React.FC = () => {
         <Typography variant="h4" gutterBottom>
           {t('main.title')}
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" paragraph>
           {t('main.description')}
         </Typography>
+        <Box mt={2}>
+          <Button 
+            variant="contained" 
+            color="primary"
+            onClick={() => onNavigateToEdit('test-document-1')}
+          >
+            Open Test Document
+          </Button>
+        </Box>
       </Paper>
     </Container>
   );

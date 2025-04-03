@@ -4,6 +4,7 @@ import { CircularProgress, Box } from '@mui/material';
 
 const WelcomeCt = lazy(() => import('./pages/Welcome'));
 const MainCt = lazy(() => import('./pages/Main'));
+const EditCt = lazy(() => import('./pages/Edit/EditCt'));
 
 const LoadingFallback = () => (
   <Box
@@ -24,6 +25,7 @@ export const AppRoutes = () => {
           <Route path="/" element={<Navigate to="/welcome" replace />} />
           <Route path="/welcome" element={<WelcomeCt />} />
           <Route path="/main" element={<MainCt />} />
+          <Route path="/edit/:documentId" element={<EditCt />} />
         </Routes>
       </Suspense>
     </HashRouter>
