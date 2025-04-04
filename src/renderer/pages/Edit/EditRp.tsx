@@ -2,7 +2,7 @@ import React from 'react';
 import Editor, { loader } from '@monaco-editor/react';
 import { SplitContainer } from '../../components/SplitContainer';
 
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monaco from 'monaco-editor';
 
 loader.config({ monaco });
 

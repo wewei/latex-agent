@@ -1,15 +1,19 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainRp from './MainRp';
+import { Box } from '@mui/material';
+import { NavigationPanelCt } from '../../components/NavigationPanel/NavigationPanelCt';
+import { DetailPanelCt } from '../../components/DetailPanel/DetailPanelCt';
 
-export const MainCt: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleNavigateToEdit = (documentId: string) => {
-    navigate(`/edit/${documentId}`);
-  };
-
+const MainCt: React.FC = () => {
   return (
-    <MainRp onNavigateToEdit={handleNavigateToEdit} />
+    <Box sx={{ display: 'flex', height: '100vh' }}>
+      <Box sx={{ width: 300, borderRight: 1, borderColor: 'divider' }}>
+        <NavigationPanelCt />
+      </Box>
+      <Box sx={{ flex: 1 }}>
+        <DetailPanelCt />
+      </Box>
+    </Box>
   );
 };
+
+export default MainCt;

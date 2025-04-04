@@ -24,21 +24,30 @@
     "appearance": "Appearance"
   },
   "welcome": {
+    "title": "Welcome to LaTeX Writing Assistant",
     "step1": {
-      "title": "Welcome to LaTeX Agent",
-      "description": "LaTeX Agent is a powerful tool to help you write LaTeX documents with ease. Let's get started!"
+      "title": "Step 1: Choose Workspace",
+      "description": "Select a workspace to start your writing journey"
     },
     "step2": {
-      "title": "Features Overview",
-      "description": "Our tool provides real-time preview, auto-completion, and intelligent suggestions to make your LaTeX writing experience smooth and efficient."
+      "title": "Step 2: Create Document",
+      "description": "Create a new LaTeX document or import existing ones"
     },
     "step3": {
-      "title": "Ready to Start",
-      "description": "You're all set! Click 'Finish' to begin your LaTeX writing journey."
+      "title": "Step 3: Start Writing",
+      "description": "Use AI assistant to help you with writing"
     }
   },
   "main": {
     "title": "LaTeX Agent",
     "description": "Welcome to your LaTeX writing workspace. Start by creating a new document or opening an existing one."
+  },
+  "navigation": {
+    "search": "Search documents...",
+    "recent": "Recent",
+    "shared": "Shared with me",
+    "folders": "Folders",
+    "trash": "Trash",
+    "settings": "Workspace Settings"
   }
 } 

@@ -1,3 +1,3 @@
-import { MainCt } from './MainCt';
+import MainCt from './MainCt';
 
 export default MainCt;
