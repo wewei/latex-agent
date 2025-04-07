@@ -4,6 +4,8 @@ export type Endpoint = {
   url: string;
 };
 
+export const FALLBACK_ENDPOINT_ID = '@FALLBACK';
+
 declare global {
   interface Window {
     electron: {
@@ -12,7 +14,9 @@ declare global {
         del: (key: string) => Promise<void>;
         move: (key: string, index: number) => Promise<void>;
         get: () => Promise<Endpoint[]>;
+        getFallback: () => Promise<Endpoint>;
+        load: (key: string) => Promise<void>;
       };
     };
   }
-}
+};
