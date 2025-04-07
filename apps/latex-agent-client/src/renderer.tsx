@@ -54,7 +54,7 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 // Draggable list item component
 const DraggableListItem = ({
