@@ -29,21 +29,21 @@
 import "./index.css";
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
-  TextField,
-  Button,
-  Box,
-  Paper,
-  Typography,
-  Icon,
-} from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import { 
+  List, 
+  Input, 
+  Button, 
+  Card, 
+  Typography, 
+  Space, 
+  Popconfirm,
+  message
+} from "antd";
+import { 
+  DeleteOutlined, 
+  DragOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import { Endpoint } from "./endpoints/shared";
 import {
   DndProvider,
@@ -53,6 +53,8 @@ import {
   DropTargetMonitor,
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+
+const { Title, Text } = Typography;
 
 // Draggable list item component
 const DraggableListItem = ({
@@ -66,7 +68,7 @@ const DraggableListItem = ({
   moveItem: (dragIndex: number, hoverIndex: number) => void;
   handleDelete: (key: string) => void;
 }) => {
-  const ref = React.useRef<HTMLLIElement>(null);
+  const ref = React.useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({
     type: "ITEM",
@@ -128,43 +130,49 @@ const DraggableListItem = ({
   drag(drop(ref));
 
   return (
-    <ListItem
+    <div
       ref={ref}
       key={endpoint.key}
-      sx={{
+      style={{
         border: "1px solid #e0e0e0",
-        borderRadius: 1,
-        mb: 1,
+        borderRadius: 4,
+        marginBottom: 8,
+        padding: 12,
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isDragging ? "#f0f0f0" : "transparent",
-        "&:hover": {
-          backgroundColor: "#f5f5f5",
-        },
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        cursor: "move",
       }}
-      secondaryAction={
-        <IconButton
-          edge="end"
-          aria-label="delete"
-          onClick={() => handleDelete(endpoint.key)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      }
     >
-      <DragIndicatorIcon sx={{ mr: 1, cursor: "move" }} />
-      <ListItemText primary={endpoint.name} />
-      <ListItemText
-        secondary={endpoint.url}
-        sx={{
-          textAlign: "right",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          maxWidth: "100%",
-        }}
-        onClick={() => window.electron.endpoints.load(endpoint.key)}
-      />
-    </ListItem>
+      <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+        <DragOutlined style={{ marginRight: 8, color: "#999" }} />
+        <div>
+          <div style={{ fontWeight: 500 }}>{endpoint.name}</div>
+          <div
+            style={{
+              color: "#666",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              maxWidth: "100%",
+            }}
+            onClick={() => window.electron.endpoints.load(endpoint.key)}
+          >
+            {endpoint.url}
+          </div>
+        </div>
+      </div>
+      <Popconfirm
+        title="确定要删除这个 endpoint 吗?"
+        onConfirm={() => handleDelete(endpoint.key)}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Button type="text" icon={<DeleteOutlined />} danger />
+      </Popconfirm>
+    </div>
   );
 };
 
@@ -200,12 +208,16 @@ const EndpointsList: React.FC = () => {
       setNewEndpointName("");
       setNewEndpointUrl("");
       loadEndpoints();
+      message.success("Endpoint 添加成功");
+    } else {
+      message.error("名称和 URL 不能为空");
     }
   };
 
   const handleDelete = async (key: string) => {
     await window.electron.endpoints.del(key);
     loadEndpoints();
+    message.success("Endpoint 删除成功");
   };
 
   const handleMove = async (key: string, newIndex: number) => {
@@ -226,37 +238,36 @@ const EndpointsList: React.FC = () => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Box sx={{ maxWidth: 600, margin: "20px auto", padding: 2 }}>
-        <Paper elevation={3} sx={{ padding: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Endpoints 管理
-          </Typography>
+      <div style={{ maxWidth: 600, margin: "20px auto", padding: 16 }}>
+        <Card>
+          <Title level={4}>Endpoints 管理</Title>
 
-          <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-            <TextField
-              label="名称"
-              fullWidth
-              size="small"
-              value={newEndpointName}
-              onChange={(e) => setNewEndpointName(e.target.value)}
+          <Space style={{ width: "100%", marginBottom: 16 }}>
+            <Input
               placeholder="输入新的 endpoint 名称"
+              value={newEndpointName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewEndpointName(e.target.value)}
+              style={{ flex: 1 }}
             />
-            <TextField
-              label="URL"
-              fullWidth
-              size="small"
-              value={newEndpointUrl}
-              onChange={(e) => setNewEndpointUrl(e.target.value)}
+            <Input
               placeholder="输入新的 endpoint URL"
-              onKeyUp={(e) => e.key === "Enter" && handleAdd()}
+              value={newEndpointUrl}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewEndpointUrl(e.target.value)}
+              onPressEnter={handleAdd}
+              style={{ flex: 1 }}
             />
-            <Button variant="contained" onClick={handleAdd}>
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />} 
+              onClick={handleAdd}
+            >
               添加
             </Button>
-          </Box>
+          </Space>
 
-          <List>
-            {endpointsList.map((endpoint: Endpoint, index: number) => (
+          <List
+            dataSource={endpointsList}
+            renderItem={(endpoint: Endpoint, index: number) => (
               <DraggableListItem
                 key={endpoint.key}
                 endpoint={endpoint}
@@ -264,47 +275,48 @@ const EndpointsList: React.FC = () => {
                 moveItem={moveItem}
                 handleDelete={handleDelete}
               />
-            ))}
-            {fallbackEndpoint && (
-              <ListItem
-                sx={{
-                  border: "1px solid #e0e0e0",
-                  borderRadius: 1,
-                  mb: 1,
-                  opacity: 1,
-                  backgroundColor: "transparent",
-                  "&:hover": {
-                    backgroundColor: "#f5f5f5",
-                  },
-                }}
-                secondaryAction={
-                  <IconButton edge="end" aria-label="delete" disabled>
-                    <DeleteIcon />
-                  </IconButton>
-                }
-              >
-                <DragIndicatorIcon
-                  sx={{ mr: 1, cursor: "not-allowed", color: "gray" }}
-                />
-                <ListItemText primary={fallbackEndpoint.name} />
-                <ListItemText
-                  secondary={fallbackEndpoint.url}
-                  sx={{
-                    textAlign: "right",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    maxWidth: "100%",
-                  }}
-                  onClick={() =>
-                    window.electron.endpoints.load(fallbackEndpoint.key)
-                  }
-                />
-              </ListItem>
             )}
-          </List>
-        </Paper>
-      </Box>
+          />
+          
+          {fallbackEndpoint && (
+            <div
+              style={{
+                border: "1px solid #e0e0e0",
+                borderRadius: 4,
+                marginBottom: 8,
+                padding: 12,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: "#f9f9f9",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                <DragOutlined style={{ marginRight: 8, color: "#999" }} />
+                <div>
+                  <div style={{ fontWeight: 500 }}>{fallbackEndpoint.name}</div>
+                  <div style={{ 
+                    color: "#666", 
+                    overflow: "hidden", 
+                    textOverflow: "ellipsis", 
+                    whiteSpace: "nowrap",
+                    maxWidth: "100%"
+                  }}
+                  onClick={() => window.electron.endpoints.loadFallback()}
+                  >
+                    {fallbackEndpoint.url}
+                  </div>
+                </div>
+              </div>
+              <Button 
+                type="text" 
+                icon={<DeleteOutlined />} 
+                disabled
+              />
+            </div>
+          )}
+        </Card>
+      </div>
     </DndProvider>
   );
 };

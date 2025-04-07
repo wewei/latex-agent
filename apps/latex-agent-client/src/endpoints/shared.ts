@@ -16,7 +16,8 @@ declare global {
         get: () => Promise<Endpoint[]>;
         getFallback: () => Promise<Endpoint>;
         load: (key: string) => Promise<void>;
+        loadFallback: () => Promise<void>;
       };
     };
   }
-};
+}
