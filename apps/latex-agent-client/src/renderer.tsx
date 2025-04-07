@@ -102,7 +102,7 @@ const EndpointsList: React.FC = () => {
             value={newEndpoint}
             onChange={(e) => setNewEndpoint(e.target.value)}
             placeholder="输入新的 endpoint URL"
-            onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
+            onKeyUp={(e) => e.key === 'Enter' && handleAdd()}
           />
           <Button variant="contained" onClick={handleAdd}>
             添加
@@ -110,7 +110,7 @@ const EndpointsList: React.FC = () => {
         </Box>
 
         <List>
-          {endpointsList.map((endpoint, index) => (
+          {endpointsList.map((endpoint: string, index: number) => (
             <ListItem
               key={endpoint}
               sx={{

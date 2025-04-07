@@ -63,6 +63,12 @@ importers:
       '@electron/fuses':
         specifier: ^1.8.0
         version: 1.8.0
+      '@types/react':
+        specifier: ^19.0.12
+        version: 19.1.0
+      '@types/react-dom':
+        specifier: ^19.0.4
+        version: 19.1.1(@types/react@19.1.0)
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.0.0
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@4.5.5))(eslint@8.57.1)(typescript@4.5.5)
@@ -134,10 +140,10 @@ importers:
         specifier: ^1.0.1
         version: 1.1.1(react-refresh@0.16.0)
       '@types/react':
-        specifier: ^19.0.12
+        specifier: ^19.1.0
         version: 19.1.0
       '@types/react-dom':
-        specifier: ^19.0.4
+        specifier: ^19.1.1
         version: 19.1.1(@types/react@19.1.0)
       eslint:
         specifier: ^9.21.0
