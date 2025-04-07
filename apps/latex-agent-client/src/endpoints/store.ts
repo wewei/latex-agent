@@ -1,12 +1,14 @@
 import { app } from "electron";
+import crypto from 'node:crypto';
 import fs from 'node:fs';
+import type { Endpoint } from './types';
 
 const ENDPOINTS_FILE = 'endpoints.json';
 const ENDPOINTS_PATH = app.getPath('userData') + '/' + ENDPOINTS_FILE;
 
-let endpoints: string[] = [];
+let endpoints: Endpoint[] = [];
 
-function init() {
+function readEndpoints() {
   if (!fs.existsSync(ENDPOINTS_PATH)) {
     return;
   }
@@ -18,38 +20,48 @@ function init() {
   }
 }
 
-init();
-
-export function addEndpoint(endpoint: string) {
-  endpoints.push(endpoint);
+function writeEndpoints() {
   fs.writeFileSync(ENDPOINTS_PATH, JSON.stringify({
     endpoints,
   }));
+}
+
+function init() {
+  readEndpoints();
+}
+
+init();
+
+export function addEndpoint(endpoint: Omit<Endpoint, 'key'>) {
+  const key = crypto.randomUUID();
+  endpoints.push({ ...endpoint, key });
+  writeEndpoints();
 }
 
 export function getEndpoints() {
   return endpoints;
 }
 
-export function delEndpoint(endpoint: string) {
-  if (!endpoints.includes(endpoint)) {
+export function delEndpoint(key: string) {
+  if (!endpoints.some((e) => e.key === key)) {
     return;
   }
 
-  endpoints = endpoints.filter((e) => e !== endpoint);
-  fs.writeFileSync(ENDPOINTS_PATH, JSON.stringify({
-    endpoints,
-  }));
+  endpoints = endpoints.filter((e) => e.key !== key);
+  writeEndpoints();
 }
 
-export function moveEndpoint(endpoint: string, index: number) {
-  if (!endpoints.includes(endpoint) || index < 0 || index >= endpoints.length) {
+export function moveEndpoint(key: string, index: number) {
+  if (index < 0 || index >= endpoints.length) {
     return;
   }
 
-  endpoints = endpoints.filter((e) => e !== endpoint);
+  const idx = endpoints.findIndex((e) => e.key === key);
+  if (idx === -1 || idx === index) {
+    return;
+  }
+
+  const [endpoint] = endpoints.splice(idx, 1);
   endpoints.splice(index, 0, endpoint);
-  fs.writeFileSync(ENDPOINTS_PATH, JSON.stringify({
-    endpoints,
-  }));
+  writeEndpoints();
 }

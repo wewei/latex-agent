@@ -1,8 +1,10 @@
 import { ipcRenderer } from "electron";
+import type { Endpoint } from "./types";
 
 export const endpoints = {
-  add: (endpoint: string) => ipcRenderer.invoke('addEndpoint', endpoint),
+  add: (endpoint: Omit<Endpoint, 'key'>) => ipcRenderer.invoke('addEndpoint', endpoint),
   get: () => ipcRenderer.invoke('getEndpoints'),
-  del: (endpoint: string) => ipcRenderer.invoke('delEndpoint', endpoint),
-  move: (endpoint: string, index: number) => ipcRenderer.invoke('moveEndpoint', endpoint, index),
+  del: (key: string) => ipcRenderer.invoke('delEndpoint', key),
+  move: (key: string, index: number) => ipcRenderer.invoke('moveEndpoint', key, index),
+  load: (key: string) => ipcRenderer.invoke('loadEndpoint', key),
 }

@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron';
-import { setupEndpointsIpc } from './endpoints/ipc';
+import { setupEndpointsIpc } from './endpoints/main';
 
 setupEndpointsIpc();
 
