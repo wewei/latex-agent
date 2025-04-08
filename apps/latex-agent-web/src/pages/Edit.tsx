@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Button, Space, Tooltip } from 'antd';
-import { EyeOutlined, SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined } from '@ant-design/icons';
 import Editor from '@monaco-editor/react';
 import SplitView from '../components/SplitView';
+import PdfPreview from '../components/PdfPreview';
+import { makeElectronLatexApi } from 'latex-agent-api';
 
 const { Title } = Typography;
 
@@ -14,7 +16,9 @@ type EditPageParams = {
 const EditPage: React.FC = () => {
   const { documentId } = useParams<EditPageParams>();
   const [latexContent, setLatexContent] = useState<string>('');
+  const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
 
   useEffect(() => {
     // Simulate loading document content
@@ -41,10 +45,45 @@ const EditPage: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Saving document:', documentId);
+  const handleSave = async () => {
+    const latexApi = makeElectronLatexApi();
+    console.log(latexApi);
+    if (latexApi) {
+      const pdfData = await latexApi.generatePdf(latexContent);
+      setPdfData(pdfData);
+    }
   };
+
+  const generatePdf = async () => {
+    if (!latexContent) return;
+    
+    setPreviewLoading(true);
+    try {
+      // TODO: Replace with actual API call to generate PDF
+      // This is a placeholder that simulates PDF generation
+      setTimeout(() => {
+        // Create a simple PDF ArrayBuffer (this is just a placeholder)
+        // In a real implementation, you would call a LaTeX compilation service
+        const mockPdfBuffer = new ArrayBuffer(1024);
+        setPdfData(mockPdfBuffer);
+        setPreviewLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      setPreviewLoading(false);
+    }
+  };
+
+  // Generate PDF when LaTeX content changes
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (latexContent) {
+        generatePdf();
+      }
+    }, 1000); // Debounce for 1 second
+
+    return () => clearTimeout(debounceTimer);
+  }, [latexContent]);
 
   const renderEditor = () => (
     <div style={{ height: '100%', border: '1px solid #f0f0f0', borderRadius: 4 }}>
@@ -69,11 +108,30 @@ const EditPage: React.FC = () => {
       height: '100%', 
       border: '1px solid #f0f0f0', 
       borderRadius: 4,
-      padding: 16,
-      overflow: 'auto'
+      overflow: 'hidden'
     }}>
-      <Title level={4}>Preview</Title>
-      <div>Preview will be rendered here</div>
+      {previewLoading ? (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          height: '100%'
+        }}>
+          <Spin size="large" tip="Generating PDF..." />
+        </div>
+      ) : pdfData ? (
+        <PdfPreview pdfData={pdfData} />
+      ) : (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          height: '100%',
+          color: '#8c8c8c'
+        }}>
+          <Typography.Text>Preview will appear here</Typography.Text>
+        </div>
+      )}
     </div>
   );
 
