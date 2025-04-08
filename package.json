@@ -9,11 +9,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.7.1",
+  "packageManager": "pnpm@10.8.0",
   "pnpm": {
     "onlyBuiltDependencies": [
+      "core-js",
       "electron",
-      "electron-winstaller",
       "sharp"
     ]
   },
@@ -21,6 +21,7 @@
     "cross-env": "^7.0.3"
   },
   "dependencies": {
+    "latex-agent-api": "link:packages\\latex-agent-api",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1"
   }

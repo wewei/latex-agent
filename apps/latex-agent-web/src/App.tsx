@@ -1,30 +1,63 @@
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Layout, Menu } from "antd";
+import { FileTextOutlined, HomeOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import MainPage from "./pages/Main";
+import EditPage from "./pages/Edit";
+
+const { Header, Content, Sider } = Layout;
 
 function App() {
-	const [count, setCount] = useState(0);
+	const [collapsed, setCollapsed] = useState(false);
 
 	return (
-		<div className="App">
-			<div>
-				<a href="https://reactjs.org" target="_blank" rel="noreferrer">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-			</div>
-			<h1>Rspack + React + TypeScript</h1>
-			<div className="card">
-				<button type="button" onClick={() => setCount(count => count + 1)}>
-					count is {count}
-				</button>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
-			</div>
-			<p className="read-the-docs">
-				Click on the Rspack and React logos to learn more
-			</p>
-		</div>
+		<HashRouter>
+			<Layout style={{ minHeight: "100vh" }}>
+				<Header style={{ display: "flex", alignItems: "center" }}>
+					<div className="logo" />
+					<h1 style={{ color: "white", margin: 0 }}>LaTeX Agent</h1>
+				</Header>
+				<Layout>
+					<Sider
+						width={200}
+						collapsible
+						collapsed={collapsed}
+						onCollapse={(value: boolean) => setCollapsed(value)}
+					>
+						<Menu
+							theme="dark"
+							mode="inline"
+							defaultSelectedKeys={["1"]}
+							defaultOpenKeys={["sub1"]}
+							style={{ height: "100%", borderRight: 0 }}
+						>
+							<Menu.Item key="1" icon={<HomeOutlined />}>
+								<a href="#/main">Home</a>
+							</Menu.Item>
+							<Menu.Item key="2" icon={<FileTextOutlined />}>
+								<a href="#/edit/test-document">Test Document</a>
+							</Menu.Item>
+						</Menu>
+					</Sider>
+					<Layout style={{ padding: "0 24px 24px" }}>
+						<Content
+							style={{
+								padding: 24,
+								margin: 0,
+								minHeight: 280,
+								background: "#fff",
+							}}
+						>
+							<Routes>
+								<Route path="/" element={<Navigate to="/main" replace />} />
+								<Route path="/main" element={<MainPage />} />
+								<Route path="/edit/:documentId" element={<EditPage />} />
+							</Routes>
+						</Content>
+					</Layout>
+				</Layout>
+			</Layout>
+		</HashRouter>
 	);
 }
 
