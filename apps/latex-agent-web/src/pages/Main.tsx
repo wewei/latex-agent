@@ -195,7 +195,7 @@ const MainPage: React.FC = () => {
       });
 
       // 创建成功后导航到编辑页面
-      navigate(`/edit/${response.documentId}`);
+      navigate(`/edit/${response.document_id}`);
     } catch (error) {
       console.error('创建文档失败:', error);
       // 这里可以添加错误处理，如显示错误消息
