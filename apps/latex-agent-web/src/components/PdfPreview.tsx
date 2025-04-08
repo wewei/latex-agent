@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Spin, Button, Space, Typography } from 'antd';
 import { 
@@ -31,9 +31,31 @@ const PdfPreview: React.FC<PdfPreviewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
+  
+  // Create a unique key for the Document component based on the PDF data
+  const pdfKey = useMemo(() => {
+    // Create a hash of the first few bytes of the PDF data to use as a key
+    const dataView = new DataView(pdfData.slice(0, 16));
+    let hash = 0;
+    for (let i = 0; i < 16; i += 4) {
+      hash = ((hash << 5) - hash) + dataView.getInt32(i, true);
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return `pdf-${hash}`;
+  }, [pdfData]);
+
+  console.log(pdfKey);
 
   // Convert ArrayBuffer to Uint8Array for react-pdf
-  const pdfFile = new Uint8Array(pdfData);
+  const pdfFile = useMemo(() => new Uint8Array(pdfData), [pdfData]);
+
+  // Reset state when PDF data changes
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    setPageNumber(1);
+    setNumPages(null);
+  }, [pdfKey]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -177,6 +199,7 @@ const PdfPreview: React.FC<PdfPreviewProps> = ({
         
         {!loading && !error && (
           <Document
+            key={pdfKey}
             file={pdfFile}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
