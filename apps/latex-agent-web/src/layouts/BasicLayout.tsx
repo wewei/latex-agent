@@ -15,6 +15,7 @@ import {
   DownOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import type { MenuProps } from 'antd';
 import { authService } from '../services/api';
 
 const { Header, Sider, Content } = Layout;
