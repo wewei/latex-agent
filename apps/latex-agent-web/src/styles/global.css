@@ -1,0 +1,534 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+  background-color: #f0f2f5;
+}
+
+/* 确保页面内容始终填充可见区域 */
+html, body, #root {
+  height: 100%;
+}
+
+/* 响应式字体大小 */
+@media screen and (max-width: 576px) {
+  h1 {
+    font-size: 24px !important;
+  }
+  h2 {
+    font-size: 20px !important;
+  }
+  h3 {
+    font-size: 16px !important;
+  }
+}
+
+/* 修复移动端边距 */
+@media screen and (max-width: 768px) {
+  .ant-layout-content {
+    padding: 12px !important;
+    margin: 12px 8px !important;
+  }
+  
+  .ant-card {
+    overflow: hidden;
+  }
+  
+  .ant-table {
+    overflow-x: auto;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 平滑过渡 非常规用法，导致菜单位置不固定*/
+/* * {
+  transition: all 0.3s ease-in-out;
+} */
+
+/* 覆盖 Ant Design 表格样式，使其在移动设备上更紧凑 */
+@media screen and (max-width: 768px) {
+  .ant-table-cell {
+    padding: 8px 6px !important;
+  }
+  
+  .ant-descriptions-bordered .ant-descriptions-item-label, 
+  .ant-descriptions-bordered .ant-descriptions-item-content {
+    padding: 8px 12px !important;
+  }
+}
+
+/* 确保所有图片响应式缩放 */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 卡片悬停效果 */
+.ant-card-hoverable:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 按钮悬停效果 */
+.ant-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 表格行悬停效果 */
+.ant-table-tbody > tr:hover > td {
+  background-color: #f5f5f5 !important;
+}
+
+/* 标签样式 */
+.ant-tag {
+  border-radius: 4px;
+  padding: 0 8px;
+  height: 22px;
+  line-height: 20px;
+}
+
+/* 标题样式 */
+.ant-typography {
+  color: #262626;
+}
+
+/* 侧边栏样式 */
+.ant-layout-sider {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 头部样式 */
+.ant-layout-header {
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+}
+
+/* 内容区域样式 //#f0f2f5;*/
+.ant-layout-content {
+  background-color: #f0f2f5;
+  padding: 10px;
+  margin-left:10px;
+}
+
+/* 卡片样式 */
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* 表单样式 */
+.ant-form-item-label > label {
+  font-weight: 500;
+}
+
+/* 模态框样式 */
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+/* 下拉菜单样式 */
+.ant-dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 统计卡片样式 */
+.ant-statistic-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.ant-statistic-content {
+  font-size: 24px;
+  color: #262626;
+}
+
+/* 搜索框样式 */
+.ant-input-search .ant-input {
+  border-radius: 4px 0 0 4px;
+}
+
+.ant-input-search .ant-input-search-button {
+  border-radius: 0 4px 4px 0;
+}
+
+/* 分页样式 */
+.ant-pagination-item {
+  border-radius: 4px;
+}
+
+/* 标签页样式 */
+.ant-tabs-tab {
+  border-radius: 4px 4px 0 0;
+}
+
+/* 头像样式 */
+.ant-avatar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 菜单样式 */
+.ant-menu-item {
+  border-radius: 4px;
+  margin: 4px 8px;
+}
+
+.ant-menu-item-selected {
+  background-color: #1890ff !important;
+}
+
+/* 按钮组样式 */
+.ant-btn-group {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 描述列表样式 */
+.ant-descriptions-bordered .ant-descriptions-item-label {
+  background-color: #fafafa;
+}
+
+/* 表格样式 */
+.ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+}
+
+/* 模态框标题样式 */
+.ant-modal-title {
+  font-weight: 600;
+}
+
+/* 表单验证消息样式 */
+.ant-form-item-explain-error {
+  font-size: 12px;
+}
+
+/* 加载状态样式 */
+.ant-spin-dot-item {
+  background-color: #1890ff;
+}
+
+/* 通知样式 */
+.ant-notification-notice {
+  border-radius: 8px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 消息样式 */
+.ant-message-notice {
+  border-radius: 8px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 抽屉样式 */
+.ant-drawer-content {
+  border-radius: 8px 0 0 8px;
+}
+
+/* 步骤条样式 */
+.ant-steps-item-icon {
+  border-radius: 50%;
+}
+
+/* 时间轴样式 */
+.ant-timeline-item-tail {
+  border-left: 2px solid #e8e8e8;
+}
+
+/* 进度条样式 */
+.ant-progress-bg {
+  border-radius: 4px;
+}
+
+/* 徽标样式 */
+.ant-badge-count {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 上传组件样式 */
+.ant-upload-list-item {
+  border-radius: 4px;
+}
+
+/* 树形控件样式 */
+.ant-tree-node-content-wrapper {
+  border-radius: 4px;
+}
+
+/* 日历样式 */
+.ant-picker-calendar-header {
+  padding: 12px 0;
+}
+
+/* 日期选择器样式 */
+.ant-picker {
+  border-radius: 4px;
+}
+
+/* 时间选择器样式 */
+.ant-picker-time-panel {
+  border-radius: 8px;
+}
+
+/* 级联选择器样式 */
+.ant-cascader-menu {
+  border-radius: 4px;
+}
+
+/* 穿梭框样式 */
+.ant-transfer-list {
+  border-radius: 4px;
+}
+
+/* 评分组件样式 */
+.ant-rate-star {
+  margin-right: 8px;
+}
+
+/* 开关样式 */
+.ant-switch {
+  border-radius: 100px;
+}
+
+/* 滑块样式 */
+.ant-slider-track {
+  border-radius: 4px;
+}
+
+/* 数字输入框样式 */
+.ant-input-number {
+  border-radius: 4px;
+}
+
+/* 自动完成样式 */
+.ant-select-auto-complete {
+  border-radius: 4px;
+}
+
+.ant-select-dropdown {
+  position: relative;
+  top: 0, !important;
+  left:0 !important;
+}
+
+.custom-dropdown .ant-dropdown-menu {
+  animation: fadeIn 1s; /* 添加淡入动画 */
+}
+ 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 提及样式 */
+.ant-mentions {
+  border-radius: 4px;
+}
+
+/* 文本域样式 */
+.ant-input-textarea {
+  border-radius: 4px;
+}
+
+/* 密码输入框样式 */
+.ant-input-password {
+  border-radius: 4px;
+}
+
+/* 搜索框样式 */
+.ant-input-search {
+  border-radius: 4px;
+}
+
+/* 选择器样式 */
+.ant-select-selector {
+  border-radius: 4px !important;
+}
+
+/* 多选框样式 */
+.ant-checkbox-wrapper {
+  margin-right: 8px;
+}
+
+/* 单选框样式 */
+.ant-radio-wrapper {
+  margin-right: 8px;
+}
+
+/* 开关样式 */
+.ant-switch {
+  margin-right: 8px;
+}
+
+/* 按钮样式 */
+.ant-btn {
+  border-radius: 4px;
+}
+
+/* 卡片样式 */
+.ant-card-head {
+  border-radius: 8px 8px 0 0;
+}
+
+/* 表格样式 */
+.ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 分页样式 */
+.ant-pagination {
+  margin-top: 16px;
+}
+
+/* 表单样式 */
+.ant-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 模态框样式 */
+.ant-modal {
+  max-width: 90%;
+}
+
+/* 抽屉样式 */
+.ant-drawer {
+  max-width: 90%;
+}
+
+/* 通知样式 */
+.ant-notification {
+  max-width: 90%;
+}
+
+/* 消息样式 */
+.ant-message {
+  max-width: 90%;
+}
+
+/* 弹出确认框样式 */
+.ant-modal-confirm {
+  max-width: 90%;
+}
+
+/* 弹出框样式 */
+.ant-popover {
+  max-width: 90%;
+}
+
+/* 下拉菜单样式 */
+.ant-dropdown  {
+  
+  max-width: 90%;
+}
+.ant-dropdown-menu .ant-dropdown-menu-item{
+  position: relative; 
+}
+/* 工具提示样式 */
+.ant-tooltip {
+  max-width: 90%;
+}
+
+/* 气泡卡片样式 */
+.ant-popover {
+  max-width: 90%;
+}
+
+/* 气泡确认框样式 */
+.ant-popconfirm {
+  max-width: 90%;
+}
+
+/* 气泡卡片样式 */
+.ant-popover-inner {
+  border-radius: 8px;
+}
+
+/* 气泡确认框样式 */
+.ant-popconfirm-inner {
+  border-radius: 8px;
+}
+
+/* 工具提示样式 */
+.ant-tooltip-inner {
+  border-radius: 8px;
+}
+
+/* 下拉菜单样式 */
+.ant-dropdown-menu-item {
+  border-radius: 4px;
+  margin: 4px 8px;
+}
+
+/* 模态框样式 */
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+/* 抽屉样式 */
+.ant-drawer-content {
+  border-radius: 8px 0 0 8px;
+}
+
+/* 通知样式 */
+.ant-notification-notice {
+  border-radius: 8px;
+}
+
+/* 消息样式 */
+.ant-message-notice {
+  border-radius: 8px;
+}
+
+/* 弹出确认框样式 */
+.ant-modal-confirm {
+  border-radius: 8px;
+}
+
+/* 弹出框样式 */
+.ant-popover {
+  border-radius: 8px;
+}
+
+/* 下拉菜单样式 */
+.ant-dropdown {
+  border-radius: 8px;
+}
+
+/* 工具提示样式 */
+.ant-tooltip {
+  border-radius: 8px;
+}
+
+/* 气泡卡片样式 */
+.ant-popover {
+  border-radius: 8px;
+}
+
+/* 气泡确认框样式 */
+.ant-popconfirm {
+  border-radius: 8px;
+} 
