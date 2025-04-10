@@ -60,10 +60,10 @@ html, body, #root {
   background: #a8a8a8;
 }
 
-/* 平滑过渡 */
-* {
+/* 平滑过渡 非常规用法，导致菜单位置不固定*/
+/* * {
   transition: all 0.3s ease-in-out;
-}
+} */
 
 /* 覆盖 Ant Design 表格样式，使其在移动设备上更紧凑 */
 @media screen and (max-width: 768px) {

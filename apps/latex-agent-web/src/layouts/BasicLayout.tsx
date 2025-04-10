@@ -213,12 +213,12 @@ const BasicLayout: React.FC = () => {
             </div>
           </div>
           
-          <div id='user-dropdown-container' style={{ position: 'relative',  marginRight: 24}}>
+          <div id='user-dropdown-container' style={{ position: 'relative',  marginRight: 12, width: 160}}>
              <Dropdown 
               menu={{ items: userMenuItems
                 , onClick: handleUserMenuClick 
               }} 
-              overlayStyle={{ width: '200px' }}
+              // overlayStyle={{ width: 110 }}
               placement="bottomRight"
               trigger={['hover']}              
               getPopupContainer={() => document.getElementById('user-dropdown-container') || document.body}
