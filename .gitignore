@@ -50,3 +50,7 @@ Thumbs.db
 .cache
 .temp
 .tmp
+apps/latex-agent-server/latex-agent.db
+pnpm-lock.yaml
+apps/latex-agent-server/package-lock.json
+apps/server-new/package-lock.json
