@@ -15,6 +15,17 @@ export interface RegisterParams {
   password: string;
 }
 
+export interface Profile {
+  id: string;
+  username: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  currentWorkspace: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // 登录响应接口
 export interface LoginResponse {
   token: string;
@@ -52,6 +63,10 @@ const authService = {
   refreshToken: async (): Promise<{ token: string }> => {
     return apiClient.post(API_ENDPOINTS.auth.refreshToken);
   },
+
+  getMyProfile : async (): Promise<Profile> => {
+    return apiClient.get(API_ENDPOINTS.auth.myProfile);
+  }
 };
 
 export default authService; 

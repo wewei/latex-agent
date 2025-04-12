@@ -14,19 +14,17 @@ const Login: React.FC = () => {
   const onFinish = async (values: LoginParams) => {
     setLoading(true);
     try {
-      // 调用登录 API//await authService.login(values);
+      // 调用登录 API
+      const response = await authService.login(values);
       
-      const response =  {token: '111', user: { id: '1', username: 'admin', email: 'admin@example.com' }}; 
       // 保存登录状态和用户信息
       localStorage.setItem('token', response.token);
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(response.user));
       
       message.success('登录成功');
       
       // 获取重定向路径
-      const from = (location.state as any)?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
+      // const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate("/", { replace: true });
     } catch (error) {
       console.error('登录失败:', error);
       message.error('登录失败，请检查用户名和密码');

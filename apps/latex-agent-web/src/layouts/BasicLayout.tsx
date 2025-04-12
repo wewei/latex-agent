@@ -103,50 +103,6 @@ const BasicLayout: React.FC = () => {
     },
   ];
 
-  const userMenuItems: MenuProps['items'] = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: '个人中心',
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: '设置',
-    },
-    {
-      type: 'divider',
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-    },
-  ];
-
-  const handleUserMenuClick = async ({ key }: { key: string }) => {
-    console.log('haandleUerMenu。。。。。')
-    if (key === 'logout') {
-      try {
-        // 调用登出 API
-        await authService.logout();
-        
-        // 清除本地存储的认证信息
-        localStorage.removeItem('token');
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('user');
-        
-        // 重定向到登录页面
-        navigate('/login');
-      } catch (error) {
-        console.error('登出失败:', error);
-        message.error('登出失败，请稍后重试');
-      }
-    } else {
-      navigate(`/${key}`);
-    }
-  };
-
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider 
@@ -190,7 +146,7 @@ const BasicLayout: React.FC = () => {
       </Sider>
       {/* collapsed ? 30 : 30 这里暂时处理成一样的参数值，需要验证一下浏览器显示效果 */}
       <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 30 : 30), transition: 'all 0.2s' }}>
-        <Header style={{ 
+        {/* <Header style={{ 
           padding: 0, 
           background: colorBgContainer,
           position: 'sticky',
@@ -236,19 +192,8 @@ const BasicLayout: React.FC = () => {
                 </Space>
             </Dropdown> 
           </div>
-        </Header>
+        </Header> */}
         <Content
-          style={{
-            marginTop: '16px',
-            marginLeft: '0px',
-            marginRight: '0px',
-            marginBottom: '0px',
-            padding: 16,
-            background: colorBgContainer,
-            borderRadius: borderRadiusLG,
-            minHeight: 280,
-            overflow: 'auto'
-          }}
         >
           <Outlet />
         </Content>

@@ -8,6 +8,7 @@ export interface UserProfile {
   email: string;
   phone: string;
   avatar?: string;
+  currentWorkspace: string;
   createdAt: string;
   updatedAt: string;
 }
