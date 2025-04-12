@@ -1,14 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import authService from '../services/auth.service';
 import { userDao } from '../dao';
-
+import { AuthRequest } from '../types/express';
 /**
  * 必须登录的路由鉴权中间件
  */
-export const requireAuth = async (req: Express.Request, res: Response, next: NextFunction): Promise<void> => {
+export const requireAuth = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     // 获取 Authorization 头
-    const authHeader = (req as Request).headers.authorization;
+    const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       res.status(401).json({ error: 'Authentication required' });
@@ -51,10 +51,10 @@ export const requireAuth = async (req: Express.Request, res: Response, next: Nex
  * 可选登录的路由鉴权中间件
  * 不强制要求登录，但如果有登录信息则验证并添加到请求
  */
-export const optionalAuth = async (req: Express.Request, res: Response, next: NextFunction): Promise<void> => {
+export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     // 获取 Authorization 头
-    const authHeader = (req as Request).headers.authorization;
+    const authHeader = req.headers.authorization;
     
     // 如果没有鉴权头，直接放行
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -96,7 +96,7 @@ export const optionalAuth = async (req: Express.Request, res: Response, next: Ne
 /**
  * 仅管理员鉴权中间件
  */
-export const requireAdmin = async (req: Express.Request, res: Response, next: NextFunction): Promise<void> => {
+export const requireAdmin = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     // 先执行普通用户鉴权
     await new Promise<void>((resolve, reject) => {

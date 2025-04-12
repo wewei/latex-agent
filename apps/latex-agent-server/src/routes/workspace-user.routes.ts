@@ -1,8 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth.middleware';
 import workspaceUserService from '../services/workspace-user.service';
+import { AuthRequest } from '../types/express';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.post('/:workspaceId/users', requireAuth, [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   body('userId').isInt().withMessage('User ID is required'),
   body('role').optional().isIn(['owner', 'editor', 'viewer']).withMessage('Role must be one of: owner, editor, viewer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -66,7 +67,7 @@ router.put('/:workspaceId/users/:userId/role', requireAuth, [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   param('userId').isInt().withMessage('User ID must be an integer'),
   body('role').isIn(['owner', 'editor', 'viewer']).withMessage('Role must be one of: owner, editor, viewer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -114,7 +115,7 @@ router.put('/:workspaceId/users/:userId/role', requireAuth, [
 router.delete('/:workspaceId/users/:userId', requireAuth, [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   param('userId').isInt().withMessage('User ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -163,7 +164,7 @@ router.delete('/:workspaceId/users/:userId', requireAuth, [
 router.put('/:workspaceId/transfer', requireAuth, [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   body('newOwnerId').isInt().withMessage('New owner ID is required')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });

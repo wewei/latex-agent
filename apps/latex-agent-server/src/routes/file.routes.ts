@@ -1,9 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth.middleware';
 import fileService from '../services/file.service';
-
+import { AuthRequest } from '../types/express';
 const router = express.Router();
 
 /**
@@ -13,7 +13,7 @@ const router = express.Router();
  */
 router.get('/workspaces/:workspaceId/files', requireAuth, [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -47,7 +47,7 @@ router.get('/workspaces/:workspaceId/files', requireAuth, [
 router.get('/workspaces/:workspaceId/folders/:parentId?', requireAuth, [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   param('parentId').optional().isInt().withMessage('Parent ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -81,7 +81,7 @@ router.get('/workspaces/:workspaceId/folders/:parentId?', requireAuth, [
  */
 router.get('/files/:id', requireAuth, [
   param('id').isInt().withMessage('File ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -122,7 +122,7 @@ router.post('/files', requireAuth, [
   body('content').optional().isString().withMessage('Content must be a string'),
   body('parent_id').optional().isInt().withMessage('Parent ID must be an integer'),
   body('workspace_id').isInt().withMessage('Workspace ID is required')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -160,7 +160,7 @@ router.put('/files/:id', requireAuth, [
   param('id').isInt().withMessage('File ID must be an integer'),
   body('name').optional().isString().trim().isLength({ min: 1 }).withMessage('File name is required'),
   body('content').optional().isString().withMessage('Content must be a string')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -197,7 +197,7 @@ router.put('/files/:id', requireAuth, [
  */
 router.delete('/files/:id', requireAuth, [
   param('id').isInt().withMessage('File ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -234,7 +234,7 @@ router.delete('/files/:id', requireAuth, [
 router.put('/files/:id/move', requireAuth, [
   param('id').isInt().withMessage('File ID must be an integer'),
   body('parent_id').optional().isInt().withMessage('Parent ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });

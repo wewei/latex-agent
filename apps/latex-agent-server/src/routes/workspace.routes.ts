@@ -1,8 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth.middleware';
 import workspaceService from '../services/workspace.service';
+import { AuthRequest } from '../types/express';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ const router = express.Router();
  * @desc 获取用户的所有工作区
  * @access 认证用户
  */
-router.get('/', requireAuth, async (req: Request, res: Response) => {
+router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -33,7 +34,7 @@ router.get('/', requireAuth, async (req: Request, res: Response) => {
  */
 router.get('/:id', requireAuth, [
   param('id').isInt().withMessage('Workspace ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -71,7 +72,7 @@ router.post('/', requireAuth, [
   body('name').isString().trim().isLength({ min: 1, max: 100 }).withMessage('Workspace name is required (1-100 characters)'),
   body('description').optional().isString().withMessage('Description must be a string'),
   body('visibility').optional().isIn(['public', 'private', 'team']).withMessage('Visibility must be one of: public, private, team')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -101,7 +102,7 @@ router.put('/:id', requireAuth, [
   body('name').optional().isString().trim().isLength({ min: 1, max: 100 }).withMessage('Workspace name must be 1-100 characters'),
   body('description').optional().isString().withMessage('Description must be a string'),
   body('visibility').optional().isIn(['public', 'private', 'team']).withMessage('Visibility must be one of: public, private, team')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -143,7 +144,7 @@ router.put('/:id', requireAuth, [
  */
 router.delete('/:id', requireAuth, [
   param('id').isInt().withMessage('Workspace ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -179,7 +180,7 @@ router.delete('/:id', requireAuth, [
  */
 router.get('/:id/members', requireAuth, [
   param('id').isInt().withMessage('Workspace ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });

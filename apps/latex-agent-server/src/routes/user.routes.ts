@@ -1,8 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { requireAuth, requireAdmin } from '../middleware/auth.middleware';
 import userService from '../services/user.service';
+import { AuthRequest } from '../types/express';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ const router = express.Router();
  * @desc 获取所有用户
  * @access 管理员
  */
-router.get('/', requireAdmin, async (req: Request, res: Response) => {
+router.get('/', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const users = await userService.getAllUsers();
     res.json(users);
@@ -29,7 +30,7 @@ router.get('/', requireAdmin, async (req: Request, res: Response) => {
  */
 router.get('/:id', requireAuth, [
   param('id').isInt().withMessage('User ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
     
@@ -61,7 +62,7 @@ router.post('/', [
   body('username').isString().trim().isLength({ min: 3, max: 50 }).withMessage('Username must be between 3 and 50 characters'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password_hash').isString().isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const userData = req.body;
     const newUser = await userService.createUser(userData);
@@ -88,7 +89,7 @@ router.put('/:id', requireAuth, [
   param('id').isInt().withMessage('User ID must be an integer'),
   body('username').optional().isString().trim().isLength({ min: 3, max: 50 }).withMessage('Username must be between 3 and 50 characters'),
   body('email').optional().isEmail().withMessage('Valid email is required')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
     
@@ -123,7 +124,7 @@ router.put('/:id', requireAuth, [
  */
 router.delete('/:id', requireAuth, [
   param('id').isInt().withMessage('User ID must be an integer')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
     
@@ -155,7 +156,7 @@ router.put('/:id/password', requireAuth, [
   param('id').isInt().withMessage('User ID must be an integer'),
   body('currentPassword').isString().withMessage('Current password is required'),
   body('newPassword').isString().isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const id = parseInt(req.params.id, 10);
     

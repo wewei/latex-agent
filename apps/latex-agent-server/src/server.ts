@@ -1,10 +1,10 @@
-import express from 'express';
+import express, { NextFunction, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { initializeDatabase } from './db';
 import router from './routes';
-
+import { AuthRequest } from './types/express';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -33,7 +33,7 @@ app.use((req, res) => {
 });
 
 // 错误处理
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: AuthRequest, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
 });

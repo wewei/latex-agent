@@ -51,7 +51,7 @@ apiClient.interceptors.response.use(
     // 处理其他错误
     if (response && response.data) {
       // 显示服务器返回的错误消息
-      message.error((response.data as any).message || '请求失败');
+      message.error((response.data as { message: string }).message || '请求失败');
     } else {
       // 显示网络错误消息
       message.error('网络错误，请稍后重试');

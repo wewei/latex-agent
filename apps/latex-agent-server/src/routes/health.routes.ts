@@ -1,4 +1,5 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
+import { AuthRequest } from '../types/express';
 const router = express.Router();
 
 /**
@@ -6,7 +7,7 @@ const router = express.Router();
  * @desc 检查 API 健康状态
  * @access 公共
  */
-router.get('/', (_req: Request, res: Response) => {
+router.get('/', (_req: AuthRequest, res: Response) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),

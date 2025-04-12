@@ -1,9 +1,10 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import { body } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth.middleware';
 import authService from '../services/auth.service';
 import userService from '../services/user.service';
+import { AuthRequest } from '../types/express';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const router = express.Router();
 router.post('/login', [
   body('username').isString().notEmpty().withMessage('Username is required'),
   body('password').isString().notEmpty().withMessage('Password is required')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const { username, password } = req.body;
     
@@ -42,7 +43,7 @@ router.post('/register', [
   body('username').isString().isLength({ min: 3, max: 50 }).withMessage('Username must be 3-50 characters'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isString().isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-], validate, async (req: Request, res: Response) => {
+], validate, async (req: AuthRequest, res: Response) => {
   try {
     const { username, email, password } = req.body;
     
@@ -89,7 +90,7 @@ router.post('/register', [
  * @desc 获取当前用户信息
  * @access 认证用户
  */
-router.get('/me', requireAuth, async (req: Request, res: Response) => {
+router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     // 如果用户已通过认证，req.user 应该存在
     if (!req.user) {
