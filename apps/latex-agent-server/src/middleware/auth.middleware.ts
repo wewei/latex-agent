@@ -35,10 +35,7 @@ export const requireAuth = async (req: AuthRequest, res: Response, next: NextFun
     }
     
     // 将用户信息添加到请求对象
-    req.user = {
-      ...user,
-      isAdmin: payload.isAdmin
-    };
+    req.user = user;
     
     next();
   } catch (error) {
@@ -78,12 +75,7 @@ export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFu
     const user = await userDao.findById(payload.userId);
     
     // 如果找到用户，将用户信息添加到请求对象
-    if (user) {
-      req.user = {
-        ...user,
-        isAdmin: payload.isAdmin
-      };
-    }
+    req.user = user;
     
     next();
   } catch (error) {
@@ -115,7 +107,7 @@ export const requireAdmin = async (req: AuthRequest, res: Response, next: NextFu
     }
     
     // 检查是否为管理员
-    if (!req.user?.isAdmin) {
+    if (!req.user?.is_admin) {
       res.status(403).json({ error: 'Admin privileges required' });
       return;
     }

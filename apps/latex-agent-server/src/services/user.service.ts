@@ -1,4 +1,4 @@
-import { userDao } from '../dao';
+import { userDao, workspaceDao } from '../dao';
 import { User } from '../models';
 
 class UserService {
@@ -42,8 +42,32 @@ class UserService {
       if (existingEmail) {
         throw new Error('Email already exists');
       }
+
+      // 创建用户
+      const user = await userDao.create(userData);
       
-      return await userDao.create(userData);
+      // 创建默认工作区
+      const workspace = await workspaceDao.createWorkspace({
+        name: userData.username + "'s Workspace",
+        description: 'Default workspace',
+        owner_id: user.id,
+        visibility: 'private',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        is_deleted: false
+      });
+
+      
+      // 返回更新后的用户对象
+      const updatedUser = await userDao.update(user.id, { 
+        default_workspace_id: workspace.id 
+      });
+      
+      if (!updatedUser) {
+        throw new Error('Failed to update user with default workspace ID');
+      }
+      
+      return updatedUser;
     } catch (error) {
       console.error('Error in UserService.createUser:', error);
       throw error;

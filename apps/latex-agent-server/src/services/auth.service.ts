@@ -59,6 +59,25 @@ class AuthService {
       }
     };
   }
+
+  /**
+   * 登出
+   */
+  async logout(userId: number): Promise<void> {
+    try {
+      // 如果您使用Redis或其他存储来跟踪活动令牌，可以在这里使其失效
+      // 例如: await redisClient.del(`user_token:${userId}`);
+      
+      // 如果您正在使用会话令牌表，可以在这里将令牌标记为已撤销
+      // 例如: await tokenDao.revokeUserTokens(userId);
+      
+      // 简单实现：仅记录登出操作
+      console.log(`User ${userId} logged out`);
+    } catch (error) {
+      console.error('Error during logout:', error);
+      throw error;
+    }
+  }
 }
 
 export default new AuthService();

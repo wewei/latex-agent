@@ -3,6 +3,7 @@ export interface User {
   username: string;
   email: string;
   password_hash: string;
+  default_workspace_id?: number;
   is_admin: boolean;
   created_at: string;
   updated_at: string;

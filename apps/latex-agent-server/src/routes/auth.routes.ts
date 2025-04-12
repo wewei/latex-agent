@@ -102,11 +102,40 @@ router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
       id: req.user.id,
       username: req.user.username,
       email: req.user.email,
-      isAdmin: req.user.isAdmin
+      default_workspace_id: req.user.default_workspace_id,
+      isAdmin: req.user.is_admin
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
     console.error('Get user error:', error);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+/**
+ * @route POST /latex/api/v1/auth/logout
+ * @desc 用户登出
+ * @access 认证用户
+ */
+router.post('/logout', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    // 获取用户ID
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    // 调用认证服务执行登出逻辑
+    await authService.logout(userId);
+    
+    res.json({ 
+      success: true,
+      message: 'Successfully logged out' 
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    console.error('Logout error:', error);
     res.status(500).json({ error: errorMessage });
   }
 });

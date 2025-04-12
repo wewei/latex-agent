@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { initializeDatabase } from './db';
 import router from './routes';
 import { AuthRequest } from './types/express';
+import { requestResponseLogger } from './middleware/logger.middleware';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,9 +13,10 @@ const port = process.env.PORT || 3000;
 // 中间件
 app.use(helmet());  // 安全头
 app.use(cors());    // 跨域支持
-app.use(morgan('dev')); // 日志
+app.use(morgan('dev')); // 简要日志
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestResponseLogger);  // 详细请求和响应日志
 
 // 公开路由
 app.get('/', (req, res) => {
@@ -22,7 +24,6 @@ app.get('/', (req, res) => {
     message: 'Welcome to the LaTeX Agent API Server!'
   });
 });
-
 
 // API 路由 - 大部分需要鉴权
 app.use('/latex/api/v1', router);

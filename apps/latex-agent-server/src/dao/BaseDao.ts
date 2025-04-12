@@ -17,7 +17,7 @@ export default abstract class BaseDao<T> {
   async findById(id: number): Promise<T | undefined> {
     try {
       const db = getDatabase();
-      return await db.get<T>(`SELECT * FROM ${this.tableName} WHERE id = ? AND is_deleted = 0`, [id]);
+      return await db.get<T>(`SELECT * FROM ${this.tableName} WHERE id = ?`, [id]);
     } catch (error) {
       console.error(`Error in ${this.tableName}.findById:`, error);
       throw error;
