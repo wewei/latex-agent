@@ -4,7 +4,9 @@ import { validate } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth.middleware';
 import { User } from 'latex-agent-dao';
 import workspaceService from '../services/workspace.service';
+import fileService from '../services/file.service';
 import { AuthRequest } from '../types/express';
+import { it } from 'node:test';
 
 const router = express.Router();
 
@@ -212,6 +214,77 @@ router.get('/:id/members', requireAuth, [
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
     console.error('Error getting workspace members:', error);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+/**
+ * @route GET /latex/api/v1/workspaces/:workspaceId/files
+ * @desc 获取工作区下的所有文件
+ * @access 认证用户（拥有访问权限）
+ */
+router.get('/:workspaceId/files', requireAuth, [
+  param('workspaceId').isInt().withMessage('Workspace ID must be an integer')
+], validate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const workspaceId = parseInt(req.params.workspaceId, 10);
+    
+    try {
+      const files = await fileService.getFilesByWorkspace(workspaceId, req.user.id);
+      res.json({
+        items: files,
+        total: files.length
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Permission denied') {
+          return res.status(403).json({ error: 'Permission denied' });
+        }
+      }
+      throw error;
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    console.error('Error getting files:', error);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+/**
+ * @route GET /latex/api/v1/workspaces/:workspaceId/folders/:parentId?
+ * @desc 获取目录下的文件
+ * @access 认证用户（拥有访问权限）
+ */
+router.get('/:workspaceId/folders/:parentId?', requireAuth, [
+  param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
+  param('parentId').optional().isInt().withMessage('Parent ID must be an integer')
+], validate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const workspaceId = parseInt(req.params.workspaceId, 10);
+    const parentId = req.params.parentId ? parseInt(req.params.parentId, 10) : null;
+    
+    try {
+      const files = await fileService.getFilesByParent(workspaceId, parentId, req.user.id);
+      res.json(files);
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Permission denied') {
+          return res.status(403).json({ error: 'Permission denied' });
+        }
+      }
+      throw error;
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    console.error('Error getting files:', error);
     res.status(500).json({ error: errorMessage });
   }
 });

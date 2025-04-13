@@ -2,6 +2,7 @@ import express from 'express';
 import userRoutes from './user.routes';
 import workspaceRoutes from './workspace.routes';
 import fileRoutes from './file.routes';
+import documentRoutes from './document.routes'; // 新增
 import workspaceUserRoutes from './workspace-user.routes';
 import healthRoutes from './health.routes';
 import authRoutes from './auth.routes';
@@ -11,11 +12,11 @@ const router = express.Router();
 
 // 注册路由模块
 router.use('/users', userRoutes);
-// 认证路由
 router.use('/auth', authRoutes);
 router.use('/workspaces', requireAuth, workspaceRoutes);
-router.use('/file', requireAuth, fileRoutes);  // 文件路由包含多个基础路径
-router.use('/workspaces', requireAuth, workspaceUserRoutes);  // 工作区用户路由在工作区路由下
+router.use('/files', requireAuth, fileRoutes);
+router.use('/documents', requireAuth, documentRoutes); // 新增
+router.use('/workspaces', requireAuth, workspaceUserRoutes);
 router.use('/health', healthRoutes);
 
 // API 根端点
@@ -26,6 +27,7 @@ router.get('/', (_req, res) => {
       '/users',
       '/workspaces',
       '/files',
+      '/documents', // 更新端点列表
       '/health'
     ]
   });

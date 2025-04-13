@@ -102,7 +102,7 @@ router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
       id: req.user.id,
       username: req.user.username,
       email: req.user.email,
-      default_workspace_id: req.user.default_workspace_id,
+      currentWorkspace: req.user.default_workspace_id,
       isAdmin: req.user.is_admin
     });
   } catch (error) {

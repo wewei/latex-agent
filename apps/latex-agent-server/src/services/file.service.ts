@@ -1,5 +1,5 @@
-import { fileDao, workspaceDao } from 'latex-agent-dao';
-import { File } from 'latex-agent-dao';
+import { fileDao, documentDao } from 'latex-agent-dao';
+import { File, Document } from 'latex-agent-dao';
 import workspaceService from './workspace.service';
 
 class FileService {
@@ -8,12 +8,12 @@ class FileService {
    */
   async getFilesByWorkspace(workspaceId: number, userId: number): Promise<File[]> {
     try {
-      // 检查用户是否有权限访问工作区
-      const hasAccess = await workspaceService.checkAccess(workspaceId, userId);
+      // TODO:检查用户是否有权限访问工作区
+      // const hasAccess = await workspaceService.checkAccess(workspaceId, userId);
       
-      if (!hasAccess) {
-        throw new Error('Permission denied');
-      }
+      // if (!hasAccess) {
+      //   throw new Error('Permission denied');
+      // }
       
       return await fileDao.findByWorkspaceId(workspaceId);
     } catch (error) {
@@ -78,13 +78,6 @@ class FileService {
         throw new Error('Permission denied');
       }
       
-      // 检查路径是否已存在
-      const existingFile = await fileDao.findByPath(fileData.path, fileData.workspace_id);
-      
-      if (existingFile) {
-        throw new Error('A file with this path already exists');
-      }
-      
       // 创建文件
       return await fileDao.create({
         ...fileData,
@@ -95,6 +88,23 @@ class FileService {
       console.error('Error in FileService.createFile:', error);
       throw error;
     }
+  }
+  
+  /**
+   * 创建文件并关联文档
+   * @param fileData 文件数据
+   * @param content 文档内容 (可选)
+   * @returns 创建的文件和文档
+   */
+  async createFileWithDocument(
+    fileData: Omit<File, 'id'>, 
+    content?: string
+  ): Promise<File> {
+    // 如果提供了内容，先创建文档
+    const document = await documentDao.createDocument(content);
+    
+    // 创建文件并关联文档    
+    return await fileDao.createWithDocument(fileData, document?.id);
   }
   
   /**
@@ -177,6 +187,6 @@ class FileService {
       throw error;
     }
   }
-}
+  }
 
 export default new FileService();
