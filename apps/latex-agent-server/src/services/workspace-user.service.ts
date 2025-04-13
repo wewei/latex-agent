@@ -1,4 +1,4 @@
-import { workspaceDao, workspaceUserDao, userDao } from '../dao';
+import { workspaceDao, workspaceUserDao, userDao } from 'latex-agent-dao';
 
 class WorkspaceUserService {
   /**

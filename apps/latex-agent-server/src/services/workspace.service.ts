@@ -1,5 +1,5 @@
-import { workspaceDao, workspaceUserDao } from '../dao';
-import { Workspace } from '../models';
+import { workspaceDao, workspaceUserDao } from 'latex-agent-dao';
+import { Workspace } from 'latex-agent-dao';
 
 class WorkspaceService {
   /**

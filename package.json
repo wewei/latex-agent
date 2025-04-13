@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "latex-agent-api": "link:packages\\latex-agent-api",
+    "latex-agent-dao": "link:packages\\latex-agent-dao",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1"
   }

@@ -2,7 +2,7 @@ import express, { NextFunction, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { initializeDatabase } from './db';
+import { initializeDatabase } from 'latex-agent-dao';
 import router from './routes';
 import { AuthRequest } from './types/express';
 import { requestResponseLogger } from './middleware/logger.middleware';

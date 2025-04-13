@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
 import authService from '../services/auth.service';
-import { userDao } from '../dao';
+import { userDao } from 'latex-agent-dao';
 import { AuthRequest } from '../types/express';
 /**
  * 必须登录的路由鉴权中间件

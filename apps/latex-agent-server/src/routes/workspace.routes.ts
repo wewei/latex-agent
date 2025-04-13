@@ -2,10 +2,16 @@ import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { requireAuth } from '../middleware/auth.middleware';
+import { User } from 'latex-agent-dao';
 import workspaceService from '../services/workspace.service';
 import { AuthRequest } from '../types/express';
 
 const router = express.Router();
+
+
+const getUser = (req : any) : User | undefined => {
+  return req.user;
+}
 
 /**
  * @route GET /latex/api/v1/workspaces
@@ -14,7 +20,8 @@ const router = express.Router();
  */
 router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.user) {
+    const user = getUser(req);
+    if (!user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
     

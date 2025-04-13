@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { userDao } from '../dao';
+import { userDao } from 'latex-agent-dao';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const TOKEN_EXPIRES_IN = '24h';
