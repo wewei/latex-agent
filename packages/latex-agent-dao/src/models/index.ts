@@ -23,13 +23,13 @@ export interface Workspace {
 export interface File {
   id: number;
   name: string;
-  path: string;
-  parent_id?: number;
+  parent_id: number | null;
   owner_id: number;
-  workspace_id: number;
+  document_id: number; // 新增字段
   created_at: string;
   updated_at: string;
   is_deleted: boolean;
+  workspace_id: number;
 }
 
 export interface WorkspaceUser {
@@ -37,4 +37,23 @@ export interface WorkspaceUser {
   user_id: number;
   role: 'owner' | 'editor' | 'viewer';
   created_at: string;
+}
+
+export interface RecentVisit {
+  id: number;
+  user_id: number;
+  file_id: number;
+  visited_at: string;
+}
+
+/**
+ * 文档内容模型
+ */
+export interface Document {
+  id: number;
+  content: string | null;
+  version: number;
+  hash?: string;
+  created_at: string;
+  updated_at: string;
 }

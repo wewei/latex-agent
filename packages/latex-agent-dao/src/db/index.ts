@@ -72,17 +72,24 @@ const initializeTables = async (): Promise<void> => {
       CREATE TABLE IF NOT EXISTS files (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        path TEXT NOT NULL,
         parent_id INTEGER,
         owner_id INTEGER NOT NULL,
+        document_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         is_deleted BOOLEAN DEFAULT 0,
         workspace_id INTEGER NOT NULL,
         FOREIGN KEY (parent_id) REFERENCES files (id),
         FOREIGN KEY (owner_id) REFERENCES users (id),
-        FOREIGN KEY (workspace_id) REFERENCES workspaces (id)
+        FOREIGN KEY (workspace_id) REFERENCES workspaces (id),
+        FOREIGN KEY (document_id) REFERENCES documents (id) ON DELETE SET NULL
       )
+    `);
+    
+    // 为 document_id 添加索引以提高查询性能
+    await db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_files_document_id
+      ON files (document_id)
     `);
     
     // 工作区用户关系表
@@ -96,6 +103,36 @@ const initializeTables = async (): Promise<void> => {
         FOREIGN KEY (workspace_id) REFERENCES workspaces (id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
       )
+    `);
+    
+    // 最近访问记录表
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS recent_visits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        file_id INTEGER NOT NULL,
+        visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+        FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
+      )
+    `);
+    
+    // 文档内容表
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT,
+        version INTEGER DEFAULT 1,
+        hash TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    // 创建索引提高查询性能
+    await db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_recent_visits_user_time
+      ON recent_visits (user_id, visited_at DESC)
     `);
     
     console.info('数据库表初始化完成');
