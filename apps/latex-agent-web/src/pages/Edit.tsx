@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Button, Space, Tooltip } from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined, HomeOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import SplitView from '../components/SplitView';
 import PdfPreview from '../components/PdfPreview';
 import { makeElectronLatexApi } from 'latex-agent-api';
+import { documentService } from '../services/api';
+import { assert } from 'pdfjs-dist/types/src/shared/util';
 
 const { Title } = Typography;
 
@@ -19,16 +22,20 @@ const EditPage: React.FC = () => {
   const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [previewLoading, setPreviewLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Simulate loading document content
     const loadDocument = async () => {
       try {
-        // Replace with actual API call
-        setTimeout(() => {
-          setLatexContent('\\documentclass{article}\n\\begin{document}\nHello World\n\\end{document}');
+        if (!documentId) {
+          return;
+        }
+
+        documentService.getContent(documentId).then((document) => {
+          setLatexContent(document.content);
           setLoading(false);
-        }, 500);
+        });
       } catch (error) {
         console.error('Failed to load document:', error);
         setLoading(false);
@@ -46,11 +53,21 @@ const EditPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    if (!documentId) {
+      return;
+    }
+
     const latexApi = makeElectronLatexApi();
     console.log(latexApi);
     if (latexApi) {
       const pdfData = await latexApi.generatePdf(latexContent);
       setPdfData(pdfData);
+
+      documentService.update(documentId, {content: latexContent}).then(() => {
+        console.log('Document saved successfully!');
+      }).catch(() => {
+        console.error('Failed to save document:');
+      });
     }
   };
 
@@ -84,6 +101,10 @@ const EditPage: React.FC = () => {
 
     return () => clearTimeout(debounceTimer);
   }, [latexContent]);
+
+  const handleGoBack = () => {
+    navigate('/main');
+  };
 
   const renderEditor = () => (
     <div style={{ height: '100%', border: '1px solid #f0f0f0', borderRadius: 4 }}>
@@ -163,7 +184,17 @@ const EditPage: React.FC = () => {
           padding: '0 16px 16px 16px',
           borderBottom: '1px solid #f0f0f0'
         }}>
-          <Title level={4} style={{ margin: 0 }}>Document: {documentId}</Title>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Tooltip title="Back to Main">
+              <Button 
+                type="text"
+                icon={<HomeOutlined />} 
+                onClick={handleGoBack}
+                style={{ marginRight: 12 }}
+              />
+            </Tooltip>
+            <Title level={4} style={{ margin: 0 }}>Document: {documentId}</Title>
+          </div>
           <Space>
             <Tooltip title="Save Document">
               <Button 
@@ -207,4 +238,4 @@ const EditPage: React.FC = () => {
   );
 };
 
-export default EditPage; 
+export default EditPage;

@@ -39,6 +39,7 @@ function App() {
 			<Routes>
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
+				<Route path="/edit/:documentId" element={<EditPage />} />
 				<Route path="/" element={
 					<ProtectedRoute>
 						<BasicLayout />
@@ -46,7 +47,7 @@ function App() {
 				}>
 					<Route path="/" element={<Navigate to="/main" replace />} />
 					<Route path="main" element={<MainPage />} />
-					<Route path="edit/:documentId" element={<EditPage />} />
+					
 					<Route path="dashboard" element={<Dashboard />} />
 					<Route path="workspaces" element={<Workspaces />} />
 					<Route path="folders">

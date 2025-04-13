@@ -61,11 +61,25 @@ export const API_ENDPOINTS = {
     update: (id: string) => `/documents/${id}`,
     delete: (id: string) => `/documents/${id}`,
     detail: (id: string) => `/documents/${id}`,
+    content: (id: string) => `/documents/${id}/content`,
+    search: '/documents/search',
     upload: '/documents/upload',
     download: (id: string) => `/documents/${id}/download`,
-    share: (id: string) => `/documents/${id}/share`,
-    shareList: (id: string) => `/documents/${id}/shares`,
-    removeShare: (id: string, shareId: string) => `/documents/${id}/shares/${shareId}`,
-    sharedWithMe: '/documents/shared-with-me',
+    linkToFile: (id: string) => `/documents/${id}/link-to-file`,
+    unlinkFromFile: (id: string) => `/documents/${id}/unlink-from-file`
   },
-}; 
+
+  // 文件相关
+  file: {
+    list: '/files',
+    byWorkspace: (workspaceId: string) => `/workspaces/${workspaceId}/files`,
+    byParent: (parentId: string) => `/folders/${parentId}/files`,
+    create: '/files',
+    update: (id: string) => `/files/${id}`,
+    delete: (id: string) => `/files/${id}`,
+    detail: (id: string) => `/files/${id}`,
+    download: (id: string) => `/files/${id}/download`,
+    move: (id: string) => `/files/${id}/move`,
+    copy: (id: string) => `/files/${id}/copy`,
+  }
+};

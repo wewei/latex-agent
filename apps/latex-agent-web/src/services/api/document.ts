@@ -4,29 +4,24 @@ import { API_ENDPOINTS } from './config';
 // 文档接口
 export interface Document {
   id: string;
-  name: string;
-  path: string;
-  folderId: string | null;
-  workspaceId: string;
-  size: number;
-  type: string;
+  content: string;
+  version?: number;
   createdAt: string;
   updatedAt: string;
+  fileId?: string | null;
 }
 
 // 创建文档参数接口
 export interface CreateDocumentParams {
-  name: string;
-  folderId?: string | null;
-  workspaceId: string;
   content?: string;
+  fileId?: string | null;
+  name?: string;
+  workspaceId?: string;
 }
 
 // 更新文档参数接口
 export interface UpdateDocumentParams {
-  name?: string;
-  folderId?: string | null;
-  content?: string;
+  content: string;
 }
 
 // 文档列表响应接口
@@ -69,6 +64,19 @@ const documentService = {
     return apiClient.get(API_ENDPOINTS.document.detail(id));
   },
   
+  // 获取文档内容
+  getContent: async (id: string): Promise<{ content: string; version: number }> => {
+    return apiClient.get(API_ENDPOINTS.document.content(id));
+  },
+  
+  // 搜索文档内容
+  search: async (params: { 
+    searchTerm: string; 
+    workspaceId?: string 
+  }): Promise<DocumentListResponse> => {
+    return apiClient.get(API_ENDPOINTS.document.search, { params });
+  },
+  
   // 上传文档
   upload: async (file: File, params: { folderId?: string | null; workspaceId: string }): Promise<Document> => {
     const formData = new FormData();
@@ -89,6 +97,6 @@ const documentService = {
       responseType: 'blob',
     });
   },
-};
+  };
 
-export default documentService; 
+export default documentService;
