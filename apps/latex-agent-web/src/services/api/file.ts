@@ -66,6 +66,8 @@ const fileService = {
     page?: number;
     pageSize?: number;
     searchTerm?: string;
+    orderBy?: string;
+    order?: 'asc' | 'desc';
   }): Promise<FileListResponse> => {
     return apiClient.get(API_ENDPOINTS.file.byWorkspace(workspaceId), { params });
   },

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, use } from 'react';
-import { Typography, Card, Button, Dropdown, Menu, Tabs, Space, Row, Col, Avatar, Tooltip, Empty, MenuProps } from 'antd';
+import { Typography, Card, Button, Dropdown, Menu, Tabs, Space, Row, Col, Avatar, Tooltip, Empty, MenuProps, Modal, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useGlobalContext ,GlobalStateProvider, GlobalStateContext} from '../common/GlobalStateContext';
 import {
   PlusOutlined,
   DownOutlined,
@@ -12,30 +13,14 @@ import {
   SettingOutlined,
   LogoutOutlined,
   UserOutlined,
-  StarOutlined
+  StarOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 import { authService, fileService } from '../services/api';
+import { UserProfile } from '../services/api/user';
+// import UserProfileComponent from '../components/UserProfileComp';
 
-const userMenuItems: MenuProps['items'] = [
-  {
-    key: 'profile',
-    icon: <UserOutlined />,
-    label: '个人中心',
-  },
-  {
-    key: 'settings',
-    icon: <SettingOutlined />,
-    label: '设置',
-  },
-  {
-    type: 'divider',
-  },
-  {
-    key: 'logout',
-    icon: <LogoutOutlined />,
-    label: '退出登录',
-  },
-];
+
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -60,44 +45,29 @@ const formatLastEdited = (dateString: string) => {
 };
 
 const MainPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('');
   const [currentDocuments, setCurrentDocuments] = useState<any[]>([]);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const {userProfile} = useGlobalContext()
   const [loading, setLoading] = useState(true);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDocId, setSelectedDocId] = useState('');
+  const [messageApi, contextHolder] = message.useMessage();
+  const showModal = (docId: string) => {
+    setIsModalOpen(true);
+    setSelectedDocId(docId);
+  };
   // 使用 React Router 的导航钩子
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
-  // 在组件挂载时检查用户登录状态
-  useEffect(() => {
-    const checkUserAuth = async () => {
-      try {
-        setLoading(true);
-        const profile = await authService.getMyProfile();
-
-        console.log('User profile:', profile);
-        setUserProfile(profile);
-      } catch (error) {
-        console.error('Failed to get user profile:', error);
-        // 重定向到登录页面
-        navigate('/login');
-        // 如果没有使用 React Router，可以使用以下方式重定向
-        // window.location.href = '/login';
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkUserAuth();
-  }, [navigate]);
-
-  useEffect(() => {
-    console.log('activeTab changed:', activeTab);
-    // 这里可以添加任何需要在组件加载时执行的逻辑
+  const fetchDocuments = async () => {
+    if(!userProfile) {
+      setCurrentDocuments([]); 
+      return;
+    }
     switch (activeTab) {
       case 'all':
         const fetchAll = async () => {
-          const files = await fileService.getByWorkspace(userProfile?.currentWorkspace || 0);
+          const files = await fileService.getByWorkspace(userProfile.currentWorkspace);
 
           if (files && files.items) {
             const transformedDocs = files.items.map((file: any) => ({
@@ -113,11 +83,27 @@ const MainPage: React.FC = () => {
             setCurrentDocuments([]);
           }
         }
-
         fetchAll();
         break;
       case 'recent':
-        setCurrentDocuments([]);
+        const fetchRecent = async () => {
+          const files = await fileService.getByWorkspace(userProfile.currentWorkspace);
+
+          if (files && files.items) {
+            const transformedDocs = files.items.map((file: any) => ({
+              id: file.id,
+              title: file.name,
+              isPrivate: true,
+              creator: userProfile?.username?.charAt(0)?.toUpperCase() || 'U',
+              lastEdited: formatLastEdited(file.updatedAt)
+            }));
+            
+            setCurrentDocuments(transformedDocs);
+          } else {
+            setCurrentDocuments([]);
+          }
+        }
+        fetchRecent();
         break;
       case 'created':
         setCurrentDocuments([]);
@@ -126,10 +112,30 @@ const MainPage: React.FC = () => {
         setCurrentDocuments([]);
         break;
     }
+  }
+
+  useEffect(() => {
+    console.log('userProfile changed:', userProfile);
+    if(userProfile!=undefined && userProfile.id!=''){
+      setLoading(false);
+      setActiveTab('all');
+    }
+  }, [userProfile]);
+  
+ 
+  useEffect(() => {    
+    // 这里可以添加任何需要在组件加载时执行的逻辑
+    fetchDocuments();
   }, [activeTab]);
+
+
+  useEffect(()=>{
+    console.log('currentDocuments', currentDocuments);
+  }, currentDocuments);
 
   // 如果正在加载用户信息，显示加载状态
   if (loading) {
+    
     return (
       <div style={{
         display: 'flex',
@@ -141,6 +147,7 @@ const MainPage: React.FC = () => {
       </div>
     );
   }
+
 
   // const newDropdownMenu = (
   //   <Menu>
@@ -210,6 +217,22 @@ const MainPage: React.FC = () => {
   const handleCardClick = (docId: string) => {
     navigate(`/edit/${docId}`);
   };
+  
+  const handleDeleteFile = async (docId: string) => {
+    console.log('handleDeleteFile', docId);
+    try {
+      // 调用API删除文档
+      const response = await fileService.delete(docId);
+      messageApi.success('删除成功！');
+      fetchDocuments();
+    } catch (error) {
+      console.error('删除文档失败:', error);
+    } finally {
+      setIsModalOpen(false);
+    }
+  }
+
+  
 
   // 渲染文档卡片
   const renderDocumentCards = () => {
@@ -221,8 +244,12 @@ const MainPage: React.FC = () => {
       );
     }
 
+ 
+
     return (
       <Row gutter={[16, 16]}>
+        
+        {contextHolder}
         {currentDocuments.map(doc => (
           <Col xs={24} sm={12} md={8} key={doc.id}>
             <Card
@@ -255,7 +282,11 @@ const MainPage: React.FC = () => {
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+        
+                <Button type="text" title='删除' danger icon={<DeleteOutlined />}  onClick={(e) => {e.stopPropagation();showModal(doc.id);}}>
+                </Button>
                   <Tooltip title="更多操作">
+                   
                     <Button
                       type="text"
                       icon={<EllipsisOutlined />}
@@ -322,33 +353,10 @@ const MainPage: React.FC = () => {
             </Button>
           </Dropdown> */}
         </div>
-
+        
         {/* 显示当前用户信息 */}
-        {userProfile && (
-          <div>
-            <Dropdown
-              menu={{
-                items: userMenuItems
-                , onClick: handleUserMenuClick
-              }}
-              // overlayStyle={{ width: 110 }}
-              placement="bottomRight"
-              trigger={['hover']}
-              getPopupContainer={() => document.getElementById('user-dropdown-container') || document.body}
-            >
-
-              <Space style={{ cursor: 'pointer' }}>
-                <Avatar style={{ backgroundColor: '#5829BC' }}>
-                  {userProfile.username?.charAt(0).toUpperCase() || 'U'}
-                </Avatar>
-                <span style={{ marginLeft: 8 }}>{userProfile.username}</span>
-                <DownOutlined />
-              </Space>
-            </Dropdown>
-          </div>
-        )}
+        {/* <UserProfileComponent/> */}
       </div>
-
       {/* 标签栏 */}
       <Tabs
         activeKey={activeTab}
@@ -363,6 +371,16 @@ const MainPage: React.FC = () => {
 
       {/* 文档卡片网格 - 根据当前标签页显示不同内容 */}
       {renderDocumentCards()}
+
+     
+      {/* //显示模式对话框 */}
+      <Modal title="确认删除" open={isModalOpen} onOk={
+        ()=>{
+          handleDeleteFile(selectedDocId);
+      }} 
+      onCancel={()=>setIsModalOpen(false)}>
+        <p>文件删除后无法恢复，确认删除此文件么？</p>
+      </Modal>
     </div>
   );
 };

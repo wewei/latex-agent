@@ -15,6 +15,7 @@ import Folders from './pages/Folders';
 import SharedFolders from './pages/SharedFolders';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import { GlobalStateProvider } from "./common/GlobalStateContext";
 
 const { Header, Content, Sider } = Layout;
 
@@ -42,7 +43,9 @@ function App() {
 				<Route path="/edit/:documentId" element={<EditPage />} />
 				<Route path="/" element={
 					<ProtectedRoute>
-						<BasicLayout />
+						<GlobalStateProvider>
+							<BasicLayout />
+						</GlobalStateProvider>
 					</ProtectedRoute>
 				}>
 					<Route path="/" element={<Navigate to="/main" replace />} />

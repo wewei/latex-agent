@@ -17,6 +17,7 @@ import {
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import type { MenuProps } from 'antd';
 import { authService } from '../services/api';
+import UserProfileComponent from '../components/UserProfileComp';
 
 const { Header, Sider, Content } = Layout;
 
@@ -25,8 +26,10 @@ const BasicLayout: React.FC = () => {
   
    
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   const navigate = useNavigate();
   const location = useLocation();
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -146,7 +149,8 @@ const BasicLayout: React.FC = () => {
       </Sider>
       {/* collapsed ? 30 : 30 这里暂时处理成一样的参数值，需要验证一下浏览器显示效果 */}
       <Layout style={{ marginLeft: isMobile ? 0 : (collapsed ? 30 : 30), transition: 'all 0.2s' }}>
-        {/* <Header style={{ 
+       
+        <Header style={{ 
           padding: 0, 
           background: colorBgContainer,
           position: 'sticky',
@@ -169,12 +173,12 @@ const BasicLayout: React.FC = () => {
                 height: 64,
               }}
             />
-            <div style={{ marginLeft: 16 }}>
+            {/* <div style={{ marginLeft: 16 }}>
               <span style={{ fontSize: '18px' }}>LaTeX Agent 工作平台</span>
-            </div>
+            </div> */}
           </div>
           
-          <div id='user-dropdown-container' style={{ position: 'relative',  marginRight: 12, width: 160}}>
+          {/* <div id='user-dropdown-container' style={{ position: 'relative',  marginRight: 12, width: 160}}>
              <Dropdown 
               menu={{ items: userMenuItems
                 , onClick: handleUserMenuClick 
@@ -191,8 +195,11 @@ const BasicLayout: React.FC = () => {
                   <DownOutlined />
                 </Space>
             </Dropdown> 
-          </div>
-        </Header> */}
+          </div> */}
+          
+              <UserProfileComponent />
+        
+        </Header> 
         <Content
         >
           <Outlet />
