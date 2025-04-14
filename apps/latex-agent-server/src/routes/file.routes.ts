@@ -1,7 +1,6 @@
 import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
-import { requireAuth } from '../middleware/auth.middleware';
 import fileService from '../services/file.service';
 import { AuthRequest } from '../types/express';
 const router = express.Router();
@@ -11,7 +10,7 @@ const router = express.Router();
  * @desc 获取指定文件
  * @access 认证用户（拥有访问权限）
  */
-router.get('/:id', requireAuth, [
+router.get('/:id', [
   param('id').isInt().withMessage('File ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
@@ -47,7 +46,7 @@ router.get('/:id', requireAuth, [
  * @desc 创建新文件
  * @access 认证用户（拥有访问权限）
  */
-router.post('/', requireAuth, [
+router.post('/', [
   body('name').isString().trim().isLength({ min: 1 }).withMessage('File name is required'),
   body('type').isString().isIn(['file', 'folder']).withMessage('Type must be either file or folder'),
   body('content').optional().isString().withMessage('Content must be a string'),
@@ -91,7 +90,7 @@ router.post('/', requireAuth, [
  * @desc 更新文件
  * @access 认证用户（拥有访问权限）
  */
-router.put('/:id', requireAuth, [
+router.put('/:id', [
   param('id').isInt().withMessage('File ID must be an integer'),
   body('name').optional().isString().trim().isLength({ min: 1 }).withMessage('File name is required'),
   body('content').optional().isString().withMessage('Content must be a string')
@@ -130,7 +129,7 @@ router.put('/:id', requireAuth, [
  * @desc 删除文件
  * @access 认证用户（拥有访问权限）
  */
-router.delete('/:id', requireAuth, [
+router.delete('/:id', [
   param('id').isInt().withMessage('File ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
@@ -166,7 +165,7 @@ router.delete('/:id', requireAuth, [
  * @desc 移动文件
  * @access 认证用户（拥有访问权限）
  */
-router.put('/:id/move', requireAuth, [
+router.put('/:id/move', [
   param('id').isInt().withMessage('File ID must be an integer'),
   body('parent_id').optional().isInt().withMessage('Parent ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {

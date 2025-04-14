@@ -1,7 +1,6 @@
 import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
-import { requireAuth } from '../middleware/auth.middleware';
 import { User } from 'latex-agent-dao';
 import workspaceService from '../services/workspace.service';
 import fileService from '../services/file.service';
@@ -20,7 +19,7 @@ const getUser = (req : any) : User | undefined => {
  * @desc 获取用户的所有工作区
  * @access 认证用户
  */
-router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const user = getUser(req);
     if (!user) {
@@ -41,7 +40,7 @@ router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
  * @desc 获取指定工作区
  * @access 认证用户（拥有访问权限）
  */
-router.get('/:id', requireAuth, [
+router.get('/:id', [
   param('id').isInt().withMessage('Workspace ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
@@ -77,7 +76,7 @@ router.get('/:id', requireAuth, [
  * @desc 创建新工作区
  * @access 认证用户
  */
-router.post('/', requireAuth, [
+router.post('/', [
   body('name').isString().trim().isLength({ min: 1, max: 100 }).withMessage('Workspace name is required (1-100 characters)'),
   body('description').optional().isString().withMessage('Description must be a string'),
   body('visibility').optional().isIn(['public', 'private', 'team']).withMessage('Visibility must be one of: public, private, team')
@@ -106,7 +105,7 @@ router.post('/', requireAuth, [
  * @desc 更新工作区
  * @access 认证用户（工作区所有者或管理员）
  */
-router.put('/:id', requireAuth, [
+router.put('/:id', [
   param('id').isInt().withMessage('Workspace ID must be an integer'),
   body('name').optional().isString().trim().isLength({ min: 1, max: 100 }).withMessage('Workspace name must be 1-100 characters'),
   body('description').optional().isString().withMessage('Description must be a string'),
@@ -151,7 +150,7 @@ router.put('/:id', requireAuth, [
  * @desc 删除工作区
  * @access 认证用户（工作区所有者或管理员）
  */
-router.delete('/:id', requireAuth, [
+router.delete('/:id', [
   param('id').isInt().withMessage('Workspace ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
@@ -187,7 +186,7 @@ router.delete('/:id', requireAuth, [
  * @desc 获取工作区成员
  * @access 认证用户（拥有访问权限）
  */
-router.get('/:id/members', requireAuth, [
+router.get('/:id/members', [
   param('id').isInt().withMessage('Workspace ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
@@ -223,7 +222,7 @@ router.get('/:id/members', requireAuth, [
  * @desc 获取工作区下的所有文件
  * @access 认证用户（拥有访问权限）
  */
-router.get('/:workspaceId/files', requireAuth, [
+router.get('/:workspaceId/files', [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
@@ -259,7 +258,7 @@ router.get('/:workspaceId/files', requireAuth, [
  * @desc 获取目录下的文件
  * @access 认证用户（拥有访问权限）
  */
-router.get('/:workspaceId/folders/:parentId?', requireAuth, [
+router.get('/:workspaceId/folders/:parentId?', [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   param('parentId').optional().isInt().withMessage('Parent ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {

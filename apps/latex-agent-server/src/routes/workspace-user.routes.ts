@@ -1,7 +1,6 @@
 import express, { Response } from 'express';
 import { body, param } from 'express-validator';
 import { validate } from '../middleware/validation';
-import { requireAuth } from '../middleware/auth.middleware';
 import workspaceUserService from '../services/workspace-user.service';
 import { AuthRequest } from '../types/express';
 
@@ -12,7 +11,7 @@ const router = express.Router();
  * @desc 添加用户到工作区
  * @access 认证用户（工作区所有者或管理员）
  */
-router.post('/:workspaceId/users', requireAuth, [
+router.post('/:workspaceId/users', [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   body('userId').isInt().withMessage('User ID is required'),
   body('role').optional().isIn(['owner', 'editor', 'viewer']).withMessage('Role must be one of: owner, editor, viewer')
@@ -63,7 +62,7 @@ router.post('/:workspaceId/users', requireAuth, [
  * @desc 更新工作区中用户的角色
  * @access 认证用户（工作区所有者或管理员）
  */
-router.put('/:workspaceId/users/:userId/role', requireAuth, [
+router.put('/:workspaceId/users/:userId/role', [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   param('userId').isInt().withMessage('User ID must be an integer'),
   body('role').isIn(['owner', 'editor', 'viewer']).withMessage('Role must be one of: owner, editor, viewer')
@@ -112,7 +111,7 @@ router.put('/:workspaceId/users/:userId/role', requireAuth, [
  * @desc 从工作区移除用户
  * @access 认证用户（工作区所有者、自己或管理员）
  */
-router.delete('/:workspaceId/users/:userId', requireAuth, [
+router.delete('/:workspaceId/users/:userId', [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   param('userId').isInt().withMessage('User ID must be an integer')
 ], validate, async (req: AuthRequest, res: Response) => {
@@ -161,7 +160,7 @@ router.delete('/:workspaceId/users/:userId', requireAuth, [
  * @desc 转移工作区所有权
  * @access 认证用户（工作区所有者或管理员）
  */
-router.put('/:workspaceId/transfer', requireAuth, [
+router.put('/:workspaceId/transfer', [
   param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
   body('newOwnerId').isInt().withMessage('New owner ID is required')
 ], validate, async (req: AuthRequest, res: Response) => {
