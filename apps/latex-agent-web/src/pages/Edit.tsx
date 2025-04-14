@@ -56,18 +56,11 @@ const EditPage: React.FC = () => {
       return;
     }
 
-    const latexApi = makeHttpLatexApi('http://localhost:3000/latex/api/v1/latex/convert');
-    console.log(latexApi);
-    if (latexApi) {
-      const pdfData = await latexApi.generatePdf(latexContent);
-      setPdfData(pdfData);
-
-      documentService.update(documentId, { content: latexContent }).then(() => {
-        console.log('Document saved successfully!');
-      }).catch(() => {
-        console.error('Failed to save document:');
-      });
-    }
+    documentService.update(documentId, { content: latexContent }).then(() => {
+      console.log('Document saved successfully!');
+    }).catch(() => {
+      console.error('Failed to save document:');
+    });
   };
 
   // Generate PDF when LaTeX content changes
