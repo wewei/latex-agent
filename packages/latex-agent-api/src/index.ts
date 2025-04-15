@@ -23,8 +23,12 @@ export const makeElectronLatexApi = (): LatexApi | null => {
 export const makeHttpLatexApi = (url: string): LatexApi => {
   return {
     generatePdf: async (latexContent: string): Promise<ArrayBuffer> => {
+
       const response = await fetch(url, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ latexContent }),
       });
 
