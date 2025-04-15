@@ -6,6 +6,7 @@ import workspaceService from '../services/workspace.service';
 import fileService from '../services/file.service';
 import { AuthRequest } from '../types/express';
 import { it } from 'node:test';
+import recentVisitService from '../services/recentVisit.service';
 
 const router = express.Router();
 
@@ -238,6 +239,75 @@ router.get('/:workspaceId/files', [
         items: files,
         total: files.length
       });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Permission denied') {
+          return res.status(403).json({ error: 'Permission denied' });
+        }
+      }
+      throw error;
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    console.error('Error getting files:', error);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+/**
+ * @route GET /latex/api/v1/workspaces/:workspaceId/myfiles
+ * @desc 获取工作区下我创建的所有文件
+ * @access 认证用户（拥有访问权限）
+ */
+router.get('/:workspaceId/myfiles', [
+  param('workspaceId').isInt().withMessage('Workspace ID must be an integer')
+], validate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }    
+    const workspaceId = parseInt(req.params.workspaceId, 10);    
+    try {
+      const files = await fileService.getFilesByWorkspaceAndUser(workspaceId, req.user.id);
+      res.json({
+        items: files,
+        total: files.length
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Permission denied') {
+          return res.status(403).json({ error: 'Permission denied' });
+        }
+      }
+      throw error;
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    console.error('Error getting files:', error);
+    res.status(500).json({ error: errorMessage });
+  }
+});
+
+/**
+ * @route GET /latex/api/v1/workspaces/:workspaceId/recent-visits
+ * @desc 获取工作区下的最近访问文件列表
+ * @access 认证用户（拥有访问权限）
+ */
+router.get('/:workspaceId/recent-visits', [
+  param('workspaceId').isInt().withMessage('Workspace ID must be an integer')
+], validate, async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const workspaceId = parseInt(req.params.workspaceId, 10);
+    const userId = req.user.id;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+
+    try {
+      const visits = await recentVisitService.getUserRecentVisits(userId, workspaceId, limit);
+      res.json({ items: visits, total: visits.length });
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === 'Permission denied') {

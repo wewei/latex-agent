@@ -1,0 +1,20 @@
+select * from recent_visits where user_id = 1;
+
+select file_id, visited_at from recent_visits v left join documents d on v.file_id = d.id;
+
+select * from files f where f.id in
+    (select file_id from recent_visits v left join documents d on v.file_id = d.id) and f.workspace_id = 1;
+    
+
+
+ SELECT rv.user_id, rv.file_id as document_id, rv.visited_at, 
+ f.*
+      FROM recent_visits rv
+      JOIN documents d ON rv.file_id = d.id
+      JOIN files f ON f.document_id = d.id
+      WHERE rv.user_id = 1 AND f.is_deleted = 0 AND f.workspace_id = 1
+      ORDER BY rv.visited_at DESC
+      LIMIT 10;
+      
+
+select * from files f where f.owner_id = 1 and f.workspace_id = 1  AND f.is_deleted = 0

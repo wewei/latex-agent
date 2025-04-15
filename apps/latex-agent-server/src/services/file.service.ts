@@ -41,6 +41,25 @@ class FileService {
     }
   }
   
+   /**
+   * 获取工作区下指定用户创建的所有文件
+   */
+   async getFilesByWorkspaceAndUser(workspaceId: number, userId: number): Promise<File[]> {
+    try {
+      // 检查用户是否有权限访问工作区
+      const hasAccess = await workspaceService.checkAccess(workspaceId, userId);
+      
+      if (!hasAccess) {
+        throw new Error('Permission denied');
+      }
+      
+      return await fileDao.findByWorkspaceIdAndUserId(workspaceId, userId);
+    } catch (error) {
+      console.error('Error in FileService.getFilesByWorkspaceAndUser:', error);
+      throw error;
+    }
+  }
+  
   /**
    * 通过ID获取文件
    */

@@ -72,6 +72,7 @@ const fileService = {
     return apiClient.get(API_ENDPOINTS.file.byWorkspace(workspaceId), { params });
   },
   
+
   // 根据父文件夹ID获取文件列表
   getByParent: async (parentId: string, params?: {
     page?: number;
@@ -81,6 +82,18 @@ const fileService = {
   }): Promise<FileListResponse> => {
     return apiClient.get(API_ENDPOINTS.file.byParent(parentId), { params });
   },
+
+  // 根据工作区ID获得我创建的文件列表
+  getMyListByWorkspace: async (workspaceId: string, params?: {
+    page?: number;
+    pageSize?: number;
+    searchTerm?: string;
+    orderBy?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<FileListResponse> => {
+    return apiClient.get(API_ENDPOINTS.file.mylistByWorkspace(workspaceId), { params });
+  },
+    
   
   // 创建文件
   create: async (params: CreateFileParams): Promise<File> => {

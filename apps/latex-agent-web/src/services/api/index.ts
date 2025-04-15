@@ -4,6 +4,7 @@ import workspaceService from './workspace';
 import folderService from './folder';
 import documentService from './document';
 import fileService from './file';
+import recentVisitService from './recentVisit';
 import { API_CONFIG, API_ENDPOINTS } from './config';
 import apiClient from './client';
 import { LoginParams, RegisterParams } from './auth';
@@ -16,6 +17,7 @@ export {
   folderService,
   documentService,
   fileService,
+  recentVisitService,
   API_CONFIG,
   API_ENDPOINTS,
   apiClient
@@ -34,6 +36,7 @@ export default {
   folder: folderService,
   document: documentService,
   file: fileService,
+  recentVisit: recentVisitService,
   config: API_CONFIG,
   endpoints: API_ENDPOINTS,
   client: apiClient,

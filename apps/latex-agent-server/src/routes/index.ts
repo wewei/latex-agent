@@ -7,6 +7,7 @@ import workspaceUserRoutes from './workspace-user.routes';
 import healthRoutes from './health.routes';
 import authRoutes from './auth.routes';
 import latexRoutes from './latex.routes';
+import recentVisitRoutes from './recentVisit.routes';
 import { requireAuth } from '../middleware/auth.middleware';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.use('/documents', requireAuth, documentRoutes);
 router.use('/latex', latexRoutes);
 router.use('/workspaces', requireAuth, workspaceUserRoutes);
 router.use('/health', healthRoutes);
+router.use('/recent-visits', requireAuth, recentVisitRoutes);
 
 // API 根端点
 router.get('/', (_req, res) => {
@@ -31,7 +33,8 @@ router.get('/', (_req, res) => {
       '/files',
       '/documents',
       '/latex',
-      '/health'
+      '/health',
+      '/recent-visits'
     ]
   });
 });

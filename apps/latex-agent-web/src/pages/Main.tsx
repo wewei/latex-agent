@@ -16,7 +16,7 @@ import {
   StarOutlined,
   DeleteOutlined
 } from '@ant-design/icons';
-import { authService, fileService } from '../services/api';
+import { authService, fileService,recentVisitService } from '../services/api';
 import { UserProfile } from '../services/api/user';
 // import UserProfileComponent from '../components/UserProfileComp';
 
@@ -30,7 +30,6 @@ const formatLastEdited = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
   const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-  
   if (diffInDays === 0) {
     return '今天';
   } else if (diffInDays === 1) {
@@ -68,14 +67,16 @@ const MainPage: React.FC = () => {
       case 'all':
         const fetchAll = async () => {
           const files = await fileService.getByWorkspace(userProfile.currentWorkspace);
-
+          //@TODO creator 需要从数据库中返回
           if (files && files.items) {
             const transformedDocs = files.items.map((file: any) => ({
               id: file.id,
               title: file.name,
               isPrivate: true,
               creator: userProfile?.username?.charAt(0)?.toUpperCase() || 'U',
-              lastEdited: formatLastEdited(file.updatedAt)
+              ownerId: file.owner_id,
+              ownerName: file.owner_name,
+              lastEdited: formatLastEdited(file.updated_at)
             }));
             
             setCurrentDocuments(transformedDocs);
@@ -87,7 +88,7 @@ const MainPage: React.FC = () => {
         break;
       case 'recent':
         const fetchRecent = async () => {
-          const files = await fileService.getByWorkspace(userProfile.currentWorkspace);
+          const files = await recentVisitService.getRecentVisitByWorkspace(userProfile.currentWorkspace);
 
           if (files && files.items) {
             const transformedDocs = files.items.map((file: any) => ({
@@ -95,7 +96,9 @@ const MainPage: React.FC = () => {
               title: file.name,
               isPrivate: true,
               creator: userProfile?.username?.charAt(0)?.toUpperCase() || 'U',
-              lastEdited: formatLastEdited(file.updatedAt)
+              ownerId: file.owner_id,
+              ownerName: file.owner_name,
+              lastVisited: formatLastEdited(file.visited_at)
             }));
             
             setCurrentDocuments(transformedDocs);
@@ -106,7 +109,26 @@ const MainPage: React.FC = () => {
         fetchRecent();
         break;
       case 'created':
-        setCurrentDocuments([]);
+        const fetchMyFiles = async () => {
+          const files = await fileService.getMyListByWorkspace(userProfile.currentWorkspace);
+          
+          if (files && files.items) {
+            const transformedDocs = files.items.map((file: any) => ({
+              id: file.id,
+              title: file.name,
+              isPrivate: true,
+              creator: userProfile?.username?.charAt(0)?.toUpperCase() || 'U',
+              ownerId: file.owner_id,
+              ownerName: file.owner_name,
+              lastCreated: formatLastEdited(file.created_at)
+            }));
+            
+            setCurrentDocuments(transformedDocs);
+          } else {
+            setCurrentDocuments([]);
+          }
+        }
+        fetchMyFiles();
         break;
       case 'favorites':
         setCurrentDocuments([]);
@@ -306,10 +328,17 @@ const MainPage: React.FC = () => {
                   {doc.creator}
                 </Avatar>
                 <span style={{ marginLeft: 8, fontSize: 12, color: '#666' }}>
-                  由你创建
+                  由
+                  {
+                    doc.ownerId === userProfile.id ? '你' : doc.ownerName
+                  }创建
                 </span>
                 <span style={{ marginLeft: 8, fontSize: 12, color: '#666' }}>
-                  上次查看于 {doc.lastEdited}
+                  {
+                    doc.lastEdited ? '上次编辑于'+doc.lastEdited :
+                    doc.lastCreated ? '创建于'+doc.lastCreated : 
+                    doc.lastVisited ? '上次查看于'+doc.lastVisited : ""
+                  }
                 </span>
               </div>
             </Card>

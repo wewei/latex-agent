@@ -1,4 +1,4 @@
-import { documentDao, fileDao, Document } from 'latex-agent-dao';
+import { documentDao, fileDao, Document, recentVisitDao } from 'latex-agent-dao';
 
 class DocumentService {
   /**
@@ -36,10 +36,20 @@ class DocumentService {
    * 获取文档内容
    * @param documentId 文档ID
    */
-  async getDocument(documentId: number): Promise<Document | { content: string, version: number }> {
+  async getDocument(documentId: number, userId?:number): Promise<Document | { content: string, version: number }> {
     const document = await documentDao.findById(documentId);
+ 
     if (!document) {
       return { content: '', version: 0 };
+    }      
+    if(userId != undefined){        
+      //保存用户最近访问记录
+      //？这里记录的是documentID, 而不是fileID, 再确认
+      const result = await recentVisitDao.recordVisit(userId, documentId);
+      console.log('result',result);
+      if (!result) {
+        console.error('Failed to record visit');
+      }
     }
     return document;
   }

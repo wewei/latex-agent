@@ -72,6 +72,7 @@ export const API_ENDPOINTS = {
   // 文件相关
   file: {
     list: '/files',
+    mylistByWorkspace: (workspaceId: string) => `/workspaces/${workspaceId}/myfiles`,
     byWorkspace: (workspaceId: string) => `/workspaces/${workspaceId}/files`,
     byParent: (parentId: string) => `/folders/${parentId}/files`,
     create: '/files',
@@ -81,5 +82,13 @@ export const API_ENDPOINTS = {
     download: (id: string) => `/files/${id}/download`,
     move: (id: string) => `/files/${id}/move`,
     copy: (id: string) => `/files/${id}/copy`,
+  },
+  // 最近访问相关
+  recentVisit: {
+    list: '/recent-visits',
+    byWorkspace: (workspaceId: string) => `/workspaces/${workspaceId}/recent-visits`,
+    record: '/recent-visits',
+    clearAll: '/recent-visits',
+    clearFile: (fileId: string) => `/recent-visits/file/${fileId}`,
   }
 };

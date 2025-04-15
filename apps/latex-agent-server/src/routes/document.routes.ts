@@ -66,15 +66,14 @@ router.get('/:id', [
  */
 router.get('/:id/content', [
   param('id').isInt().withMessage('文档ID必须是整数')
-], async (req: Request, res: Response) => {
+], async (req: AuthRequest, res: Response) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
-    const documentId = parseInt(req.params.id);
-    const document = await documentService.getDocument(documentId);
+    const documentId = parseInt(req.params.id)
+    const document = await documentService.getDocument(documentId, req.user.id);
     
     if (!document) {
       return res.status(404).json({ error: '文档不存在' });

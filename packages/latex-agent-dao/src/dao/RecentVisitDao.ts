@@ -56,23 +56,23 @@ export default class RecentVisitDao extends BaseDao<RecentVisit> {
   /**
    * 获取用户最近访问
    * @param userId 用户ID
+   * @param workspaceId 工作空间ID
    * @param limit 返回数量限制
    * @returns 最近访问记录列表，包含文件基本信息
    */
-  async getUserRecentVisits(userId: number, limit: number = 20): Promise<any[]> {
+  async getUserRecentVisits(userId: number, workspaceId: number, limit: number = 20): Promise<any[]> {
     const db = getDatabase();
-    
+
     return db.all(`
-      SELECT rv.id, rv.user_id, rv.file_id, rv.visited_at,
-             f.name as file_name, f.path as file_path, 
-             f.workspace_id, w.name as workspace_name
+         SELECT rv.user_id, rv.file_id as document_id, rv.visited_at, f.*, u.username as owner_name
       FROM recent_visits rv
-      JOIN files f ON rv.file_id = f.id
-      JOIN workspaces w ON f.workspace_id = w.id
-      WHERE rv.user_id = ? AND f.is_deleted = 0
+      JOIN documents d ON rv.file_id = d.id
+      JOIN files f ON f.document_id = d.id
+      JOIN users u ON f.owner_id = u.id
+      WHERE rv.user_id = ? AND f.is_deleted = 0 AND f.workspace_id = ?
       ORDER BY rv.visited_at DESC
       LIMIT ?
-    `, [userId, limit]);
+    `, [userId, workspaceId, limit]);
   }
   
   /**

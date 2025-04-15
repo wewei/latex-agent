@@ -14,7 +14,8 @@ export default class FileDao extends BaseDao<File> {
     try {
       const db = getDatabase();
       return await db.all<File[]>(
-        'SELECT * FROM files WHERE workspace_id = ? AND is_deleted = 0',
+        `SELECT f.* , u.username as owner_name FROM files f join users u on f.owner_id = u.id WHERE f.workspace_id = ? 
+        AND f.is_deleted = 0`,
         [workspaceId]
       );
     } catch (error) {
@@ -43,6 +44,22 @@ export default class FileDao extends BaseDao<File> {
       return await db.all<File[]>(query, params);
     } catch (error) {
       console.error('Error in FileDao.findByParentId:', error);
+      throw error;
+    }
+  }
+
+   /**
+   * 获取工作区下指定用户创建的所有文件
+   */
+   async findByWorkspaceIdAndUserId(workspaceId: number, userId: number): Promise<File[]> {
+    try {
+      const db = getDatabase();
+      return await db.all<File[]>(
+        'SELECT f.*, u.username as owner_name FROM files f join users u on f.owner_id = u.id WHERE f.workspace_id = ? AND f.is_deleted = 0 AND f.owner_id = ?',
+        [workspaceId, userId]
+      );
+    } catch (error) {
+      console.error('Error in FileDao.findByWorkspaceIdAndUserId:', error);
       throw error;
     }
   }

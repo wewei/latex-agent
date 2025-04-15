@@ -60,7 +60,9 @@ class UserService {
       
       // 返回更新后的用户对象
       const updatedUser = await userDao.update(user.id, { 
-        default_workspace_id: workspace.id 
+        default_workspace_id: workspace.id ,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       });
       
       if (!updatedUser) {
