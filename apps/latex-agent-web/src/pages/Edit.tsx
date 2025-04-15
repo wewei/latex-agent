@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // 添加 useRef 导入
 import { useParams } from 'react-router-dom';
 import { Card, Typography, Spin, Button, Space, Tooltip } from 'antd';
 import { SaveOutlined, HomeOutlined } from '@ant-design/icons';
@@ -16,9 +16,12 @@ type EditPageParams = {
 };
 
 const EditPage: React.FC = () => {
-  const { documentId } = useParams<EditPageParams>();
+    const { documentId } = useParams<EditPageParams>();
   const [latexContent, setLatexContent] = useState<string>('');
   const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null);
+  // 新增加载状态
+  // 用于存储定时器ID的引用
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,20 +66,44 @@ const EditPage: React.FC = () => {
     });
   };
 
-  // Generate PDF when LaTeX content changes
+  // 修改 PDF 生成逻辑，添加防抖
   useEffect(() => {
-    const generatePdfData = async () => {
-      if (latexContent) {
+    // 清除上一个计时器
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+
+    // 没有内容就不设置计时器
+    if (!latexContent) {
+      return;
+    }
+
+    // 设置新的计时器，500ms 后执行 PDF 生成
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        console.log('Generating PDF after 500ms debounce...');
+        
         const api = makeHttpLatexApi('http://localhost:3000/latex/api/v1/latex/convert');
         if (api) {
           const data = await api.generatePdf(latexContent);
+          console.log('Set pdf', data);
           setPdfData(data);
-          // setPreviewLoading(false);
         }
+      } catch (error) {
+        console.error('Failed to generate PDF:', error);
+      } finally {
+      }
+    }, 500);
+
+    // 组件卸载时清除计时器
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
       }
     };
-    generatePdfData();
-  }, [latexContent]);
+  }, [latexContent]); // 仅在内容变化时重新运行
 
   const handleGoBack = () => {
     navigate('/main');
@@ -100,7 +127,7 @@ const EditPage: React.FC = () => {
     </div>
   );
 
-  const renderPreview = () => (
+    const renderPreview = () => (
     <div style={{
       height: '100%',
       border: '1px solid #f0f0f0',
@@ -108,20 +135,21 @@ const EditPage: React.FC = () => {
       overflow: 'hidden'
     }}>
       {
-        pdfData ? (
-          <PdfPreview pdfData={pdfData} />
-        ) : (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            color: '#8c8c8c'
-          }}>
-            <Typography.Text>Preview will appear here</Typography.Text>
+
+pdfData ? (
+        <PdfPreview pdfData={pdfData} />
+      ) : (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          color: '#8c8c8c'
+        }}>
+          <Typography.Text>Preview will appear here</Typography.Text>
+        </div>
+      )}
           </div>
-        )}
-    </div>
   );
 
   return (

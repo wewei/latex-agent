@@ -30,23 +30,30 @@ const PdfPreview: React.FC<PdfPreviewProps> = ({
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Create a unique key for the Document component based on the PDF data
-  const pdfKey = useMemo(() => {
-    // Create a hash of the first few bytes of the PDF data to use as a key
+  // 将数据转换逻辑移到 useMemo 中
+  const { pdfKey, pdfFile } = useMemo(() => {
+    // 现有的 hash 计算逻辑...
     const dataView = new DataView(pdfData.slice(0, 16));
     let hash = 0;
     for (let i = 0; i < 16; i += 4) {
       hash = ((hash << 5) - hash) + dataView.getInt32(i, true);
-      hash = hash & hash; // Convert to 32bit integer
+      hash = hash & hash;
     }
-    return `pdf-${hash}`;
-  }, [pdfData]);
+    
+    // 同时创建文件对象，避免每次渲染创建
+    const pdfDataCopy = pdfData.slice();
+    const pdfFile = new Uint8Array(pdfDataCopy);
+    
+    return { 
+      pdfKey: `pdf-${hash}`,
+      pdfFile
+    };
+  }, [pdfData]); // 只在 pdfData 变化时重新计算
+
+  // 缓存传递给 Document 的 file prop
+  const fileObject = useMemo(() => ({ data: pdfFile }), [pdfFile]);
 
   console.log(pdfKey);
-
-  // Convert ArrayBuffer to Uint8Array for react-pdf
-  const pdfDataCopy = pdfData.slice(); // Create a copy of the ArrayBuffer
-  const pdfFile = new Uint8Array(pdfDataCopy);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
 
@@ -167,7 +174,7 @@ const PdfPreview: React.FC<PdfPreviewProps> = ({
       }}>
         <Document
           key={pdfKey}
-          file={{ data: pdfFile }}
+          file={fileObject}
           onLoadSuccess={onDocumentLoadSuccess}
           onLoadError={onDocumentLoadError}
           loading={

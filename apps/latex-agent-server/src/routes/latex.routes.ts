@@ -46,15 +46,11 @@ router.get('/convert', [
  */
 router.post('/convert', async (req: Request, res: Response) => {
   try {
-    console.log('Received LaTeX code:', req.body);
-
     if (!req.body.latexContent || typeof req.body.latexContent !== 'string') {
       return res.status(400).json({ error: 'LaTeX代码必须提供且为字符串' });
     }
 
     const latexContent = req.body.latexContent;
-    
-    console.log('Received LaTeX code:', latexContent);
     // 转换为PDF
     const pdfBuffer = await latexService.convertToPdf(latexContent);
     
