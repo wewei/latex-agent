@@ -1,12 +1,13 @@
 import { fileDao, documentDao } from 'latex-agent-dao';
 import { File, Document } from 'latex-agent-dao';
 import workspaceService from './workspace.service';
+import { ParamsOptions, PaginatedResult } from 'latex-agent-dao/dist/dao/BaseDao';
 
 class FileService {
   /**
    * 获取工作区下的所有文件
    */
-  async getFilesByWorkspace(workspaceId: number, userId: number): Promise<File[]> {
+  async getFilesByWorkspace(workspaceId: number, userId: number, options?:ParamsOptions): Promise<PaginatedResult<File>> {
     try {
       // TODO:检查用户是否有权限访问工作区
       // const hasAccess = await workspaceService.checkAccess(workspaceId, userId);
@@ -15,7 +16,7 @@ class FileService {
       //   throw new Error('Permission denied');
       // }
       
-      return await fileDao.findByWorkspaceId(workspaceId);
+      return await fileDao.findByWorkspaceId(workspaceId, options);
     } catch (error) {
       console.error('Error in FileService.getFilesByWorkspace:', error);
       throw error;
@@ -44,7 +45,7 @@ class FileService {
    /**
    * 获取工作区下指定用户创建的所有文件
    */
-   async getFilesByWorkspaceAndUser(workspaceId: number, userId: number): Promise<File[]> {
+   async getFilesByWorkspaceAndUser(workspaceId: number, userId: number, options?:ParamsOptions): Promise<PaginatedResult<File>> {
     try {
       // 检查用户是否有权限访问工作区
       const hasAccess = await workspaceService.checkAccess(workspaceId, userId);

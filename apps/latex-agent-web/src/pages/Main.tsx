@@ -1,17 +1,13 @@
 import React, { useState, useEffect, use } from 'react';
-import { Typography, Card, Button, Dropdown, Menu, Tabs, Space, Row, Col, Avatar, Tooltip, Empty, MenuProps, Modal, message } from 'antd';
+import { Typography, Card, Button, Dropdown, Menu, Tabs, Space, Row, Col, Avatar, Tooltip, Empty, MenuProps, Modal, message, Pagination, PaginationProps } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalContext ,GlobalStateProvider, GlobalStateContext} from '../common/GlobalStateContext';
 import {
   PlusOutlined,
-  DownOutlined,
-  ImportOutlined,
   FileOutlined,
   LockOutlined,
   EllipsisOutlined,
   ClockCircleOutlined,
-  SettingOutlined,
-  LogoutOutlined,
   UserOutlined,
   StarOutlined,
   DeleteOutlined
@@ -46,11 +42,14 @@ const formatLastEdited = (dateString: string) => {
 const MainPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const [currentDocuments, setCurrentDocuments] = useState<any[]>([]);
+  const [totalDocuments, setTotalDocuments] = useState(0);
   const {userProfile} = useGlobalContext()
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
+  const [pageNo, setPageNo] = useState(1);
+  const [pageSize, setPageSize] = useState(2);
   const showModal = (docId: string) => {
     setIsModalOpen(true);
     setSelectedDocId(docId);
@@ -66,7 +65,8 @@ const MainPage: React.FC = () => {
     switch (activeTab) {
       case 'all':
         const fetchAll = async () => {
-          const files = await fileService.getByWorkspace(userProfile.currentWorkspace);
+          const files = await fileService.getByWorkspace(userProfile.currentWorkspace,
+            { page: pageNo, pageSize: pageSize, order: 'desc', orderBy: 'updated_at' });
           //@TODO creator 需要从数据库中返回
           if (files && files.items) {
             const transformedDocs = files.items.map((file: any) => ({
@@ -78,7 +78,7 @@ const MainPage: React.FC = () => {
               ownerName: file.owner_name,
               lastEdited: formatLastEdited(file.updated_at)
             }));
-            
+            setTotalDocuments(files.total);
             setCurrentDocuments(transformedDocs);
           } else {
             setCurrentDocuments([]);
@@ -88,7 +88,9 @@ const MainPage: React.FC = () => {
         break;
       case 'recent':
         const fetchRecent = async () => {
-          const files = await recentVisitService.getRecentVisitByWorkspace(userProfile.currentWorkspace);
+          const files = await recentVisitService.getRecentVisitByWorkspace(userProfile.currentWorkspace,
+             { page: pageNo, pageSize: pageSize, order: 'desc', orderBy: 'visited_at' })
+          ;
 
           if (files && files.items) {
             const transformedDocs = files.items.map((file: any) => ({
@@ -100,7 +102,7 @@ const MainPage: React.FC = () => {
               ownerName: file.owner_name,
               lastVisited: formatLastEdited(file.visited_at)
             }));
-            
+            setTotalDocuments(files.total);
             setCurrentDocuments(transformedDocs);
           } else {
             setCurrentDocuments([]);
@@ -110,7 +112,8 @@ const MainPage: React.FC = () => {
         break;
       case 'created':
         const fetchMyFiles = async () => {
-          const files = await fileService.getMyListByWorkspace(userProfile.currentWorkspace);
+          const files = await fileService.getMyListByWorkspace(userProfile.currentWorkspace,
+            { page: pageNo, pageSize: pageSize, order: 'desc', orderBy: 'created_at' });
           
           if (files && files.items) {
             const transformedDocs = files.items.map((file: any) => ({
@@ -122,7 +125,7 @@ const MainPage: React.FC = () => {
               ownerName: file.owner_name,
               lastCreated: formatLastEdited(file.created_at)
             }));
-            
+            setTotalDocuments(files.total);
             setCurrentDocuments(transformedDocs);
           } else {
             setCurrentDocuments([]);
@@ -148,12 +151,8 @@ const MainPage: React.FC = () => {
   useEffect(() => {    
     // 这里可以添加任何需要在组件加载时执行的逻辑
     fetchDocuments();
-  }, [activeTab]);
+  }, [activeTab, pageNo, pageSize]);
 
-
-  useEffect(()=>{
-    console.log('currentDocuments', currentDocuments);
-  }, currentDocuments);
 
   // 如果正在加载用户信息，显示加载状态
   if (loading) {
@@ -169,45 +168,6 @@ const MainPage: React.FC = () => {
       </div>
     );
   }
-
-
-  // const newDropdownMenu = (
-  //   <Menu>
-  //     <Menu.Item key="blank">从空白页面新建</Menu.Item>
-  //     <Menu.Item key="template">从模板新建</Menu.Item>
-  //     <Menu.Item key="ai">使用AI新建</Menu.Item>
-  //   </Menu>
-  // );
-
-  // const importDropdownMenu = (
-  //   <Menu>
-  //     <Menu.Item key="file">从文件导入</Menu.Item>
-  //     <Menu.Item key="link">从链接导入</Menu.Item>
-  //   </Menu>
-  // );
-
-
-  const handleUserMenuClick = async ({ key }: { key: string }) => {
-    console.log('haandleUerMenu。。。。。')
-    if (key === 'logout') {
-      try {
-        // 调用登出 API
-        await authService.logout();
-
-        // 清除本地存储的认证信息
-        localStorage.removeItem('token');
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('user');
-
-        // 重定向到登录页面
-        navigate('/login');
-      } catch (error) {
-        console.error('登出失败:', error);
-      }
-    } else {
-      navigate(`/${key}`);
-    }
-  };
 
   // 添加创建新文档处理函数
   const handleCreateNewDocument = async () => {
@@ -401,6 +361,19 @@ const MainPage: React.FC = () => {
       {/* 文档卡片网格 - 根据当前标签页显示不同内容 */}
       {renderDocumentCards()}
 
+      {/* 增加分页信息 */}
+      <Pagination
+        total={totalDocuments}
+        current={pageNo}
+        pageSize={pageSize}
+        showTotal={(total, range) => `第${range[0]}-${range[1]}条数据 , 共${total}条`}
+        onChange={(page, pageSize) => {
+          console.log('page', page, 'pagesize', pageSize);
+          setPageNo(page);
+          setPageSize(pageSize);
+        }}
+        align='end'
+      />
      
       {/* //显示模式对话框 */}
       <Modal title="确认删除" open={isModalOpen} onOk={

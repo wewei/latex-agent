@@ -1,4 +1,4 @@
-import BaseDao from './BaseDao';
+import BaseDao, { ParamsOptions, PaginatedResult } from './BaseDao';
 import { RecentVisit } from '../models';
 import { getDatabase } from '../db';
 
@@ -60,19 +60,36 @@ export default class RecentVisitDao extends BaseDao<RecentVisit> {
    * @param limit 返回数量限制
    * @returns 最近访问记录列表，包含文件基本信息
    */
-  async getUserRecentVisits(userId: number, workspaceId: number, limit: number = 20): Promise<any[]> {
-    const db = getDatabase();
+  async getUserRecentVisits(userId: number, workspaceId: number, options?:ParamsOptions): Promise<PaginatedResult<File>> {
+    
+    try {
+      let result : PaginatedResult<File> =  { items: [], total: 0 };
 
-    return db.all(`
-         SELECT rv.user_id, rv.file_id as document_id, rv.visited_at, f.*, u.username as owner_name
-      FROM recent_visits rv
-      JOIN documents d ON rv.file_id = d.id
-      JOIN files f ON f.document_id = d.id
-      JOIN users u ON f.owner_id = u.id
-      WHERE rv.user_id = ? AND f.is_deleted = 0 AND f.workspace_id = ?
-      ORDER BY rv.visited_at DESC
-      LIMIT ?
-    `, [userId, workspaceId, limit]);
+      const db = getDatabase();
+      let sqlQuery =`
+           SELECT rv.user_id, rv.file_id as document_id, rv.visited_at, f.*, u.username as owner_name
+        FROM recent_visits rv
+        JOIN documents d ON rv.file_id = d.id
+        JOIN files f ON f.document_id = d.id
+        JOIN users u ON f.owner_id = u.id
+        WHERE rv.user_id = ? AND f.is_deleted = 0 AND f.workspace_id = ?
+      `; 
+      let sqlParams: Array<any> = [userId, workspaceId];
+      //获取记录总条数
+      {
+        let sqlQuery2 = "SELECT COUNT(1) as totalNum " +  sqlQuery.substring(sqlQuery.indexOf('FROM'));
+        let count = await db.get<{totalNum:number}>(sqlQuery2, sqlParams);
+        result.total = count?.totalNum || 0;
+      }
+      
+      let newSqls = this.handleOptions(sqlQuery, sqlParams, options);
+
+      result.items = await db.all<File[]>(newSqls.sqlQuery, newSqls.sqlParams);
+      return result;  
+    } catch (error) {
+      console.error('Error in RecentVisitDao.getUserRecentVisits:', error);
+      throw error;
+    }
   }
   
   /**

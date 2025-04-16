@@ -1,4 +1,5 @@
 import { recentVisitDao } from 'latex-agent-dao';
+import { ParamsOptions, PaginatedResult } from 'latex-agent-dao/dist/dao/BaseDao';
 
 class RecentVisitService {
   /**
@@ -21,8 +22,8 @@ class RecentVisitService {
    * @param workspaceId 工作空间ID
    * @param limit 返回数量限制
    */
-  async getUserRecentVisits(userId: number, workspaceId: number,  limit: number = 20): Promise<any[]> {
-    return recentVisitDao.getUserRecentVisits(userId, workspaceId, limit);
+  async getUserRecentVisits(userId: number, workspaceId: number,  options?: ParamsOptions): Promise<PaginatedResult<File>> {
+    return recentVisitDao.getUserRecentVisits(userId, workspaceId, options);
   }
   
   /**

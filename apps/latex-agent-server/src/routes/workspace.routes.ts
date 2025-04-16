@@ -1,5 +1,5 @@
 import express, { Response } from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { validate } from '../middleware/validation';
 import { User } from 'latex-agent-dao';
 import workspaceService from '../services/workspace.service';
@@ -7,6 +7,8 @@ import fileService from '../services/file.service';
 import { AuthRequest } from '../types/express';
 import { it } from 'node:test';
 import recentVisitService from '../services/recentVisit.service';
+import { ParamsOptions } from 'latex-agent-dao/dist/dao/BaseDao';
+import { transferParamOption } from './common';
 
 const router = express.Router();
 
@@ -224,7 +226,11 @@ router.get('/:id/members', [
  * @access 认证用户（拥有访问权限）
  */
 router.get('/:workspaceId/files', [
-  param('workspaceId').isInt().withMessage('Workspace ID must be an integer')
+  param('workspaceId').isInt().withMessage('Workspace ID must be an integer'),
+  query('page').optional().isInt({ min: 1 }).withMessage('页码必须是大于0的整数'),
+  query('pageSize').optional().isInt({ min: 1, max: 100 }).withMessage('每页数量必须在1-100之间'),
+  query('orderBy').optional().isIn(['created_at','updated_at', 'visited_at', 'file_name']).withMessage('排序字段必须是created_at, updated_at,visited_at 或 file_name'),
+  query('order').optional().isIn(['asc', 'desc']).withMessage('排序方向必须是 asc 或 desc')
 ], validate, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -233,12 +239,11 @@ router.get('/:workspaceId/files', [
     
     const workspaceId = parseInt(req.params.workspaceId, 10);
     
+    const options =  transferParamOption(req);
+    
     try {
-      const files = await fileService.getFilesByWorkspace(workspaceId, req.user.id);
-      res.json({
-        items: files,
-        total: files.length
-      });
+      const files = await fileService.getFilesByWorkspace(workspaceId, req.user.id, options);
+      res.json(files);
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === 'Permission denied') {
@@ -267,12 +272,10 @@ router.get('/:workspaceId/myfiles', [
       return res.status(401).json({ error: 'Authentication required' });
     }    
     const workspaceId = parseInt(req.params.workspaceId, 10);    
+    const options =  transferParamOption(req);
     try {
-      const files = await fileService.getFilesByWorkspaceAndUser(workspaceId, req.user.id);
-      res.json({
-        items: files,
-        total: files.length
-      });
+      const files = await fileService.getFilesByWorkspaceAndUser(workspaceId, req.user.id, options);
+      res.json(files);
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === 'Permission denied') {
@@ -303,11 +306,12 @@ router.get('/:workspaceId/recent-visits', [
 
     const workspaceId = parseInt(req.params.workspaceId, 10);
     const userId = req.user.id;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+    
+    const options =  transferParamOption(req);
 
     try {
-      const visits = await recentVisitService.getUserRecentVisits(userId, workspaceId, limit);
-      res.json({ items: visits, total: visits.length });
+      const visits = await recentVisitService.getUserRecentVisits(userId, workspaceId, options);
+      res.json(visits);
     } catch (error) {
       if (error instanceof Error) {
         if (error.message === 'Permission denied') {

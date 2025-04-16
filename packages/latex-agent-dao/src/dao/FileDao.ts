@@ -1,4 +1,4 @@
-import BaseDao from './BaseDao';
+import BaseDao, { ParamsOptions, PaginatedResult } from './BaseDao';
 import { File } from '../models';
 import { getDatabase } from '../db';
 
@@ -10,14 +10,26 @@ export default class FileDao extends BaseDao<File> {
   /**
    * 获取工作区下的所有文件
    */
-  async findByWorkspaceId(workspaceId: number): Promise<File[]> {
+  async findByWorkspaceId(workspaceId: number, options?:ParamsOptions): Promise<PaginatedResult<File>> {
     try {
+      let result : PaginatedResult<File> =  { items: [], total: 0 };
+
       const db = getDatabase();
-      return await db.all<File[]>(
-        `SELECT f.* , u.username as owner_name FROM files f join users u on f.owner_id = u.id WHERE f.workspace_id = ? 
-        AND f.is_deleted = 0`,
-        [workspaceId]
-      );
+      let sqlQuery =  `SELECT f.* , u.username as owner_name FROM files f join users u on f.owner_id = u.id WHERE f.workspace_id = ? 
+          AND f.is_deleted = 0 `;
+      let sqlParams: Array<any> = [workspaceId];      
+
+      //获取记录总条数
+      {
+        let sqlQuery2 = "SELECT COUNT(1) as totalNum " +  sqlQuery.substring(sqlQuery.indexOf('FROM'));
+        let count = await db.get<{totalNum:number}>(sqlQuery2, sqlParams);
+        result.total = count?.totalNum || 0;
+      }
+
+      let newSqls = this.handleOptions(sqlQuery, sqlParams, options);
+
+      result.items = await db.all<File[]>(newSqls.sqlQuery, newSqls.sqlParams);
+      return result;
     } catch (error) {
       console.error('Error in FileDao.findByWorkspaceId:', error);
       throw error;
@@ -51,13 +63,25 @@ export default class FileDao extends BaseDao<File> {
    /**
    * 获取工作区下指定用户创建的所有文件
    */
-   async findByWorkspaceIdAndUserId(workspaceId: number, userId: number): Promise<File[]> {
+   async findByWorkspaceIdAndUserId(workspaceId: number, userId: number,options?:ParamsOptions): Promise<PaginatedResult<File>> {
     try {
+      let result : PaginatedResult<File> =  { items: [], total: 0 };
       const db = getDatabase();
-      return await db.all<File[]>(
-        'SELECT f.*, u.username as owner_name FROM files f join users u on f.owner_id = u.id WHERE f.workspace_id = ? AND f.is_deleted = 0 AND f.owner_id = ?',
-        [workspaceId, userId]
-      );
+      let sqlQuery = 'SELECT f.*, u.username as owner_name FROM files f join users u on f.owner_id = u.id WHERE f.workspace_id = ? AND f.is_deleted = 0 AND f.owner_id = ?'
+      let sqlParams: Array<any> = [workspaceId, userId];
+
+
+      //获取记录总条数
+      {
+        let sqlQuery2 = "SELECT COUNT(1) as totalNum " +  sqlQuery.substring(sqlQuery.indexOf('FROM'));
+        let count = await db.get<{totalNum:number}>(sqlQuery2, sqlParams);
+        result.total = count?.totalNum || 0;
+      }
+      
+      let newSqls = this.handleOptions(sqlQuery, sqlParams, options);
+
+      result.items = await db.all<File[]>(newSqls.sqlQuery, newSqls.sqlParams);
+      return result;
     } catch (error) {
       console.error('Error in FileDao.findByWorkspaceIdAndUserId:', error);
       throw error;

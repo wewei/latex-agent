@@ -1,5 +1,27 @@
 import { getDatabase } from '../db';
 
+// 定义返回结果的接口
+export interface PaginatedResult<T> {
+  items: T[];
+  total: number;
+}
+
+// 定义分页查询请求接口
+export interface PaginationOptions {
+  limit?: number;
+  offset?: number;
+}
+
+// 定义排序请求接口
+export interface SortOptions {
+  desc?: boolean;
+  orderBy?: string;
+}
+
+// 定义目前可支持的可选参数请求
+export interface ParamsOptions extends PaginationOptions, SortOptions {
+}
+
 /**
  * 基础数据访问对象类
  * 提供通用的 CRUD 操作
@@ -149,5 +171,29 @@ export default abstract class BaseDao<T> {
       console.error(`Error in ${this.tableName}.softDelete:`, error);
       throw error;
     }
+  }
+
+  /**
+   * 处理分页和排序选项
+   * 返回新的 sqlQuery 和 sqlParams
+   */
+  handleOptions (sqlQuery:string, sqlParams:Array<any>, options?: ParamsOptions):{sqlQuery:string, sqlParams:Array<any>}
+  {   
+    //增加排序
+    if (options?.orderBy) {
+      const order = options.desc ? 'DESC' : 'ASC';
+      sqlQuery += ` ORDER BY ${options.orderBy} ${order}`;
+    }
+
+    // 添加分页
+    if (options?.limit) {
+      sqlQuery += ` LIMIT ?`,
+      sqlParams.push(options.limit);
+      if (options?.offset) {
+        sqlQuery += ` OFFSET ?`;
+        sqlParams.push(options.offset);
+      }
+    }
+    return {sqlQuery, sqlParams};
   }
 }
